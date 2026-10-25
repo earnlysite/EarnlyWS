@@ -2,8 +2,8 @@
    Pages : réseau d'abord (les mises à jour arrivent tout de suite), cache en secours.
    Autres fichiers du même site : cache d'abord. Les envois du formulaire (POST / autre domaine) ne sont jamais interceptés.
    Après une modification du site, changez le numéro de version ci-dessous pour vider l'ancien cache. */
-const VERSION = 'earnly-v2';
-const CORE = ['./', './index.html', './favicon.png', './app.html'];
+const VERSION = 'earnly-v4';
+const CORE = ['./', './index.html', './favicon.png', './app.html', './og-image.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));

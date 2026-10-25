@@ -43,3 +43,11 @@ Déposer le contenu du dossier à la racine du site : Netlify (glisser-déposer)
 ## Important
 
 Concept en développement : aucune banque connectée, aucune intégration de paie active, aucun partenaire signé. Earnly n'est pas une banque et ne manipule aucun fonds.
+
+## Structure des pages
+
+- **Salarié** (`#salarie`) : téléphone de simulation en haut, calcul en cinq étapes, calendrier du cycle, fonctionnement envisagé (circuit, éligibilité, frais, données, cas de suspension), questions, statut du projet. Aucun formulaire de collecte pour les salariés.
+- **Entreprise** (`#entreprise`) : console RH fictive en haut, bénéfices attendus, rôle de l'employeur, temps administratif, parcours, informations nécessaires, ce que l'intégration impliquerait, questions, contact.
+- **Banque** (`#banque`) : tableau de bord fictif en haut (12 mois calendaires, onglet Pilote), bénéfices, circuit de remboursement et maîtrise du risque, modèle économique (scénarios A 0,20 % et B 0,70 %), proposition de pilote, cadre réglementaire, architecture, questions, contact.
+
+Tous les montants et résultats affichés sont fictifs. Voir `A-FOURNIR.md` pour les informations manquantes et les points à valider.

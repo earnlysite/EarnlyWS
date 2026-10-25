@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
 
-# Remplacez par l'adresse réelle du site avant la mise en ligne
-Sitemap: https://www.example.com/sitemap.xml
+Sitemap: https://earnlysite.github.io/EarnlyWS/sitemap.xml
