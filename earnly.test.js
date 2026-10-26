@@ -30,19 +30,33 @@ await p.fill('#cFeeA','20');chk('borne 0–5 %',(await txt('#cE')).includes('Hor
 await p.click('#dashB #cR');chk('réinitialisation',JSON.stringify(await p.evaluate(()=>EarnlyDash.C))=='{"feeA":0.2,"feeB":0.7,"share":50,"tva":20}','');
 // 6. pilote fictif : un incident n'est compté que si l'échéance est dans la fenêtre
 const pl=await p.evaluate(()=>{const P=EarnlyDash.PL;return{AB:P.advA+P.advB==P.AM,rep:P.rep==P.R.reduce((x,y)=>x+y,0),rate:P.rep<=P.due}});chk('pilote cohérent',pl.AB&&pl.rep&&pl.rate,JSON.stringify(pl));
-// 7. simulation de rentabilité : valeurs de référence calculées à la main
+// 7. simulation bancaire : valeurs de référence calculées à la main (frais, partage, pertes), sans coûts internes d'Earnly
 await p.click('#dashB [data-tab="si"]');
 const S=await p.evaluate(()=>EarnlyDash.sim);let V=0,NA=0;for(let k=0;k<12;k++){const na=12000*.4*3*Math.pow(1.03,k);NA+=na;V+=na*120}
-const HT=V*.003,EA=HT/2,LO=V*.002,LE=LO/2,VC=NA*.05,CT=EA-LE-VC,RS=CT-240000;
-chk('sim volume',near(S.V,V,1e-3),S.V);chk('sim frais HT (taux moyen 0,30 %)',near(S.HT,HT,1e-3),'');chk('sim Earnly + banque = frais (sans double comptage)',near(S.EA+S.BK,S.HT,1e-3),'');
-chk('sim pertes',near(S.LO,LO,1e-3),'');chk('sim contribution',near(S.CT,CT,1e-3),'');chk('sim résultat',near(S.RS,RS,1e-3),S.RS+' vs '+RS);
-chk('sim seuil de perte',near(S.be,(120*.003*.5-.05)/(120*.5)*100,1e-9),S.be);
-await p.fill('#sL','0');await p.dispatchEvent('#sL','input');chk('sim sans partage de pertes : seuil illimité',!isFinite(await p.evaluate(()=>EarnlyDash.sim.be)),'');
-await p.fill('#sR','100');await p.dispatchEvent('#sR','input');chk('sim zéro perte',await p.evaluate(()=>EarnlyDash.sim.LO)==0,'');
+chk('sim volume',near(S.V,V,1e-3),S.V);chk('sim frais HT (taux moyen 0,30 %)',near(S.HT,V*.003,1e-3),'');chk('sim Earnly + banque = frais (sans double comptage)',near(S.EA+S.BK,S.HT,1e-3),'');chk('sim pertes',near(S.LO,V*.002,1e-3),'');
+chk('aucun coût interne d\'Earnly dans la simulation publique',!(await p.locator('[data-pn="si"]').textContent()).match(/Coûts fixes|Coût variable|Seuil de rentabilité|Résultat Earnly/)&&await p.locator('#sF,#sV,#sL,#sCo').count()==0,'');
 // 8. traductions : aucun libellé français résiduel dans les nouveaux blocs
 for(const l of['en','es','it']){const q=await page(l,'#banque');await q.click('#dashB [data-tab="si"]');await q.click('#dashB [data-tab="pf"]');const t1=await q.locator('#dashB [data-pn="pf"]').textContent();await q.click('#dashB [data-tab="si"]');const t2=await q.locator('#dashB [data-pn="si"]').textContent(),t3=await q.locator('#pilote').textContent();
- const fr=/(Pertes|Résultat|Contribution|Impayés échus|Coût variable|Critères d|Décisions possibles|Réussite technique|Maîtrise du risque|Dans ces hypothèses)/;
+ const fr=/(Pertes|Résultat|Contribution Earnly par avance|Marge contributive|Impayés échus|Coût variable|Critères d|Décisions possibles|Réussite technique|Maîtrise du risque|Dans ces hypothèses)/;
  chk('traduction '+l,!fr.test(t1+t2+t3),(t1+t2+t3).match(fr)&&(t1+t2+t3).match(fr)[0]);await q.context().close()}
 // 9. mobile : pas de défilement horizontal
 for(const h of['#salarie','#entreprise','#banque']){const m=await page('fr',h,390);chk('mobile sans débordement '+h,await m.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),await m.evaluate(()=>document.documentElement.scrollWidth));await m.context().close()}
+
+// 10. structure : les panneaux du tableau de bord restent frères (pas de balise en trop)
+chk('panneaux frères',await p.evaluate(()=>{const ps=[...document.querySelectorAll('#dashB [data-pn]')];return ps.length===6&&ps.every(x=>x.parentElement===ps[0].parentElement)}),'');
+// 11. refonte visuelle : bloc de calcul intégré, hero sobre, démo en section, libellés d'interface
+const vis=await page('fr','#salarie');
+const V1=await vis.evaluate(()=>{const c=document.querySelector('.calc'),bg=(getComputedStyle(c).backgroundImage.includes('gradient')?[255,255]:getComputedStyle(c).backgroundColor.match(/\d+/g).map(Number)),t=c.innerText,h=document.querySelector('#v-s .hero');return{light:bg[0]>200&&bg[1]>200,snake:/[a-z]_[a-z]/.test(t),couche:/COUCHE/i.test(t),centered:getComputedStyle(h).textAlign=='center',demoInSection:!!document.querySelector('#sim #slotS .phone'),heroHasDemo:!!h.querySelector('.phone'),brief:document.querySelectorAll('#brief .card').length,demoTag:/DÉMO/.test(document.querySelector('.phone').innerText),h1:document.querySelector('#v-s h1').innerText}});
+chk('bloc de calcul clair',V1.light,'');chk('bloc de calcul : libellés lisibles (pas de snake_case)',!V1.snake&&!V1.couche,'');chk('hero centré',V1.centered&&!V1.heroHasDemo,'');chk('démo dans sa propre section',V1.demoInSection,'');chk('« En bref » : 4 blocs',V1.brief==4,V1.brief);chk('plus de pastille DÉMO',!V1.demoTag,'');
+await vis.context().close();
+const bk=await page('fr','#banque');const R2=await bk.evaluate(()=>{const b=document.querySelector('.badge');return{pill:b?parseFloat(getComputedStyle(b).borderRadius)<20:true,fb:document.querySelector('#v-b .fb')?.innerText||''}});chk('pas de pastille arrondie coupant le texte',R2.pill,'');chk('barre de fenêtre sobre',!/démonstration|simulation/i.test(R2.fb),R2.fb);await bk.context().close();
+// 12. valeurs dynamiques présentes dans le HTML statique (visibles sans JavaScript)
+const raw=fs.readFileSync(path.resolve(__dirname,'..','index.html'),'utf8');
+chk('aucun data-t vide dans le HTML statique',!/<(span|div|b)[^>]*data-t="\w+"[^>]*><\/\1>/.test(raw.replace(/<script[\s\S]*?<\/script>/g,'')),'');
+// 13. une seule méthode employeur, un seul remboursement, plus de « piste A/B » ni de « mécanisme à définir »
+const rawNoM=raw.replace(/const M=\{[\s\S]*?\};/,'');chk('plus de piste A/B',!/Piste [AB] ·/.test(rawNoM),'');chk('plus de mécanisme à valider',!/mécanisme (encore )?à (définir|valider)/.test(rawNoM),(rawNoM.match(/.{60}mécanisme (encore )?à (définir|valider).{20}/)||[''])[0]);
+// 14. texte rendu : aucune anomalie dans les 4 langues et 3 parcours
+for(const l of['fr','en','es','it'])for(const h of['#salarie','#entreprise','#banque']){const q=await page(l,h);const bad=await q.evaluate(()=>{const t=document.querySelector('.view.on').innerText;return /undefined|NaN|\bnull\b|\bde est\b/.test(t)||/\d[A-Za-zÉé]{4,}/.test(t.replace(/\d+(?:er|e|ème|st|nd|rd|th)/g,''))});chk('texte rendu sain '+l+h,!bad,'anomalie');await q.context().close()}
+// 15. matrice des responsabilités et pilote : présents et traduits
+for(const l of['en','es','it']){const q=await page(l,'#banque');const t=await q.locator('#v-b').textContent();chk('matrice traduite '+l,!/(Matrice des responsabilités|Financer et verser|Responsable :|Choix de conception|Conditions préalables)/.test(t)&&!/Tester l’avance sur salaire/.test(t),(t.match(/(Matrice des responsabilités|Financer et verser|Choix de conception|Conditions préalables|Tester l’avance sur salaire)/)||[])[0]);await q.context().close()}
 console.log('OK',ok.length,'· KO',ko.length);ko.forEach(k=>console.log(' ✗',k));await b.close();process.exit(ko.length?1:0)})();

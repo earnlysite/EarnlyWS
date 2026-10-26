@@ -39,7 +39,11 @@ Déposer le contenu du dossier à la racine du site : Netlify (glisser-déposer)
 npm i playwright && npx playwright install chromium   # une fois
 node tests/earnly.test.js
 ```
-La suite (63 contrôles) charge le site dans un vrai navigateur : erreurs console dans les 4 langues et les 3 parcours, agrégats du tableau de bord recalculés indépendamment sur 30 j / 90 j / 12 mois, export CSV, paramètres et réinitialisation, cohérence du pilote fictif, simulation de rentabilité contre des valeurs calculées à la main, traductions des nouveaux blocs, absence de défilement horizontal sur mobile. Elle ne teste ni l'envoi réel du formulaire (réseau) ni l'ouverture du CSV dans Excel.
+La suite (86 contrôles) charge le site dans un vrai navigateur : erreurs console dans les 4 langues et les 3 parcours, agrégats du tableau de bord recalculés indépendamment sur 30 j / 90 j / 12 mois, export CSV, paramètres et réinitialisation, cohérence du pilote fictif, simulation de rentabilité contre des valeurs calculées à la main, traductions des nouveaux blocs, absence de défilement horizontal sur mobile. Elle ne teste ni l'envoi réel du formulaire (réseau) ni l'ouverture du CSV dans Excel.
+
+## Fichier interne (ne pas publier)
+
+`interne/modele-interne.html` est une copie du site avec la simulation de rentabilité interne d'Earnly (coûts fixes et variables, trois scénarios, seuil de rentabilité). Ces chiffres concernent l'équipe, pas les banques : **ne pas déposer ce dossier sur GitHub Pages** (un dépôt public l'exposerait).
 
 ## Fonctionnement
 
@@ -59,5 +63,7 @@ Concept en développement : aucune banque connectée, aucune intégration de pai
 - **Banque** (`#banque`) : tableau de bord fictif en haut (12 mois calendaires, onglet Pilote), bénéfices, circuit de remboursement et maîtrise du risque, modèle économique (scénarios A 0,20 % et B 0,70 %), proposition de pilote, cadre réglementaire, architecture, questions, contact.
 
 Tous les montants et résultats affichés sont fictifs. L'onglet **Simulation** du parcours Banque calcule frais, pertes nettes, coûts, contribution par avance et seuil de rentabilité d'Earnly : toutes les valeurs de départ (partage des pertes 50 %, coût variable 0,05 €, coûts fixes 20 000 €/mois, récupération 99,8 %) sont des hypothèses de travail modifiables, pas des données.
+
+Périmètre de démonstration retenu : CDI, salaire net de référence hors primes variables, plafond de 40 % du salaire acquis (mois ramené à 30 jours), avance financée par la banque, remboursement par prélèvement SEPA autorisé le jour de la paie (choix de conception, non activé), perte nette partagée 50/50 entre la banque et Earnly (choix de conception, sans contrat), transmission des deux données par l'employeur par fichier ou dépôt sécurisé à chaque cycle.
 
 Voir `A-FOURNIR.md` pour les informations manquantes et les points à valider.
