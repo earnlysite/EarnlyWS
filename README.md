@@ -33,6 +33,14 @@ Déposer le contenu du dossier à la racine du site : Netlify (glisser-déposer)
 3. **Formulaire de contact** : les messages partent vers l'adresse du porteur du projet, sans qu'elle soit affichée sur le site. Au **premier envoi test** depuis le vrai domaine, le service de relais FormSubmit envoie un e-mail de confirmation à cette adresse : cliquer sur le lien pour activer. Tant que ce n'est pas fait, le site ouvre la messagerie du visiteur avec le message pré-rempli.
 4. **Service worker** : après chaque modification du site, changer `VERSION` dans `sw.js` (par exemple `earnly-v2`) pour que les visiteurs reçoivent la nouvelle version.
 
+## Tests
+
+```bash
+npm i playwright && npx playwright install chromium   # une fois
+node tests/earnly.test.js
+```
+La suite (63 contrôles) charge le site dans un vrai navigateur : erreurs console dans les 4 langues et les 3 parcours, agrégats du tableau de bord recalculés indépendamment sur 30 j / 90 j / 12 mois, export CSV, paramètres et réinitialisation, cohérence du pilote fictif, simulation de rentabilité contre des valeurs calculées à la main, traductions des nouveaux blocs, absence de défilement horizontal sur mobile. Elle ne teste ni l'envoi réel du formulaire (réseau) ni l'ouverture du CSV dans Excel.
+
 ## Fonctionnement
 
 - **Langues** : français, anglais, espagnol, italien (sélecteur en haut de page). Le choix est mémorisé dans le navigateur du visiteur.
@@ -50,4 +58,6 @@ Concept en développement : aucune banque connectée, aucune intégration de pai
 - **Entreprise** (`#entreprise`) : console RH fictive en haut, bénéfices attendus, rôle de l'employeur, temps administratif, parcours, informations nécessaires, ce que l'intégration impliquerait, questions, contact.
 - **Banque** (`#banque`) : tableau de bord fictif en haut (12 mois calendaires, onglet Pilote), bénéfices, circuit de remboursement et maîtrise du risque, modèle économique (scénarios A 0,20 % et B 0,70 %), proposition de pilote, cadre réglementaire, architecture, questions, contact.
 
-Tous les montants et résultats affichés sont fictifs. Voir `A-FOURNIR.md` pour les informations manquantes et les points à valider.
+Tous les montants et résultats affichés sont fictifs. L'onglet **Simulation** du parcours Banque calcule frais, pertes nettes, coûts, contribution par avance et seuil de rentabilité d'Earnly : toutes les valeurs de départ (partage des pertes 50 %, coût variable 0,05 €, coûts fixes 20 000 €/mois, récupération 99,8 %) sont des hypothèses de travail modifiables, pas des données.
+
+Voir `A-FOURNIR.md` pour les informations manquantes et les points à valider.
