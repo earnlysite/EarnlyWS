@@ -39,11 +39,15 @@ Déposer le contenu du dossier à la racine du site : Netlify (glisser-déposer)
 npm i playwright && npx playwright install chromium   # une fois
 node tests/earnly.test.js
 ```
-La suite (86 contrôles) charge le site dans un vrai navigateur : erreurs console dans les 4 langues et les 3 parcours, agrégats du tableau de bord recalculés indépendamment sur 30 j / 90 j / 12 mois, export CSV, paramètres et réinitialisation, cohérence du pilote fictif, simulation de rentabilité contre des valeurs calculées à la main, traductions des nouveaux blocs, absence de défilement horizontal sur mobile. Elle ne teste ni l'envoi réel du formulaire (réseau) ni l'ouverture du CSV dans Excel.
+La suite (118 contrôles) charge le site dans un vrai navigateur : erreurs console dans les 4 langues et les 3 parcours, agrégats du tableau de bord recalculés indépendamment sur 30 j / 90 j / 12 mois, export CSV, paramètres et réinitialisation, cohérence du pilote fictif, simulation de rentabilité contre des valeurs calculées à la main, traductions des nouveaux blocs, absence de défilement horizontal sur mobile, héros centrés et démos en sections propres, intro (affichage, passage au clic, fin automatique, respect de « réduire les animations »), définitions des indicateurs, tableaux en cartes sur mobile, lien d'évitement, contrastes calculés, titre SEO de la Banque. Elle ne teste ni l'envoi réel du formulaire (réseau) ni l'ouverture du CSV dans Excel.
 
 ## Fichier interne (ne pas publier)
 
 `interne/modele-interne.html` est une copie du site avec la simulation de rentabilité interne d'Earnly (coûts fixes et variables, trois scénarios, seuil de rentabilité). Ces chiffres concernent l'équipe, pas les banques : **ne pas déposer ce dossier sur GitHub Pages** (un dépôt public l'exposerait).
+
+## Accessibilité
+
+Contrôlée avec axe-core (WCAG 2.1 A/AA) sur les trois parcours et les six onglets du tableau de bord : 0 violation à la dernière vérification (hors dépôt, non inclus dans la suite). Navigation au clavier : lien « Aller au contenu », anneau de focus visible sur tous les éléments, flèches gauche/droite dans les onglets du tableau de bord.
 
 ## Fonctionnement
 
