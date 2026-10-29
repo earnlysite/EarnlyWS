@@ -20,7 +20,7 @@ for(const per of['30','90','12']){await p.click(`#dashB #per [data-p="${per}"]`)
 chk('référence 300 € A',near(300*.2/100,.6)&&near(300*.2/100/2,.3),'');chk('référence 300 € B',near(300*.7/100,2.1)&&near(300*.7/100/2,1.05),'');
 // 4. CSV : lignes = tableau, total = tableau, virgule décimale
 await p.click('#dashB [data-tab="op"]');
-for(const v of['','Remboursé','À venir','Impayé','_nr']){await p.selectOption('#dashB #oF',v);const[d]=await Promise.all([p.waitForEvent('download'),p.click('#dashB #oX')]);const L=fs.readFileSync(await d.path(),'utf8').split('\n'),rows=L.slice(1),sh=await txt('#oC');
+for(const v of['','Remboursé','À venir','Impayé','_nr']){await p.selectOption('#dashB #oF',v);const[d]=await Promise.all([p.waitForEvent('download'),p.click('#dashB #oX')]);const L=fs.readFileSync(await d.path(),'utf8').split('\n'),rows=L.slice(1).filter(Boolean),sh=await txt('#oC');
  chk('csv lignes '+(v||'tous'),rows.length==+sh.split(' avances')[0].replace(/\D/g,''),sh);chk('csv total '+(v||'tous'),rows.reduce((z,l)=>z+ +l.split(';')[3],0)==+sh.split('total')[1].replace(/\D/g,''),sh);
  if(!v){chk('csv décimale virgule',/;\d+,\d{2};\d+,\d{2};/.test(rows[0]),rows[0]);chk('csv en-tête taux',L[0].includes('Taux (%)'),L[0])}}
 // 5. paramètres, bornes, réinitialisation
@@ -91,4 +91,49 @@ for(const h of['#entreprise','#banque']){const q=await page('fr',h);const r=awai
  await q.keyboard.press('Tab');chk('lien d\'évitement atteignable au clavier',await q.evaluate(()=>document.activeElement.id==='skip'),'');await q.keyboard.press('Enter');chk('lien d\'évitement envoie le focus sur la vue',await q.evaluate(()=>document.activeElement.id==='v-b'),'');await q.context().close()}
 // 21. avertissements : une seule mention « aucun partenaire » par bloc de pied de page, et plus de « (hypothèses) » en colonne Source
 {const q=await page('fr','#banque');const n=await q.evaluate(()=>[...document.querySelectorAll('#v-b .foot')].filter(f=>/aucun partenaire signé, aucune intégration active/i.test(f.textContent)).length);chk('avertissement de statut non répété (Banque)',n===0,n);await q.context().close()}
+
+// 20. intro illustrée : canvas d'illustration + titre accessible, dessin réel, passage au clic, aucune erreur
+for(const[h,txt]of[['#salarie','salaire gagné'],['#entreprise','avantage salarié'],['#banque','service de plus']]){const c=await b.newContext({viewport:{width:1280,height:760}}),q=await c.newPage(),er=[];q.on('pageerror',e=>er.push(e.message));await q.addInitScript(()=>{try{localStorage.setItem('ea-lang','fr')}catch(e){}});await q.goto(URL+h);await q.waitForSelector('div#ea-open');
+ chk('intro illustrée : canvas + dialogue '+h,await q.evaluate(()=>!!document.querySelector('div#ea-open canvas')&&document.querySelector('div#ea-open').getAttribute('role')==='dialog'),'');
+ chk('intro : titre accessible '+h,(await q.locator('div#ea-open h2').textContent()).toLowerCase().includes(txt),'');
+ await q.waitForTimeout(900);const px=await q.evaluate(()=>{const cv=document.querySelector('div#ea-open canvas'),d=cv.getContext('2d').getImageData(0,0,cv.width,cv.height).data;let n=0;for(let i=0;i<d.length;i+=4*97)if(Math.abs(d[i]-244)+Math.abs(d[i+1]-246)+Math.abs(d[i+2]-249)>30)n++;return n});
+ chk('intro : le canvas dessine une illustration '+h,px>40,px);await q.click('div#ea-open button');await q.waitForSelector('div#ea-open',{state:'detached',timeout:2000});chk('intro passée sans erreur '+h,er.length===0,er.join());await c.close()}
+// 21. console RH simulée : chaque bouton a un effet visible, saisies contrôlées, aucune donnée d'avance
+{const e=await page('fr','#entreprise'),T=async s=>(await e.locator(s).textContent()).trim(),H0=async()=>(await e.locator('#rcH li').first().textContent());
+ chk('console : état initial',(await T('#rcV'))==='3 / 11'&&(await T('#rcTo'))==='6'&&(await T('#rcS'))==='2','');
+ await e.click('#rcT button[aria-label^="Confirmer — Inès R."]');chk('confirmer : KPI + statut + historique',(await T('#rcV'))==='4 / 11'&&(await H0()).includes('Dossier confirmé : Inès R.'),await T('#rcV'));
+ await e.fill('#rcF','camille');chk('recherche (sans accent ni casse)',(await e.locator('#rcT tr').count())===1,'');await e.fill('#rcF','');
+ await e.selectOption('#rcSt','flag');chk('filtre « signalés »',(await e.locator('#rcT tr').count())===2,'');await e.selectOption('#rcSt','');
+ await e.fill('#rcF','zzz');chk('état vide de la recherche',(await T('#rcT')).includes('Aucun salarié'),'');await e.fill('#rcF','');
+ await e.click('#rcT button[aria-label^="Modifier — Hugo B."]');await e.fill('#rcES','50');await e.click('#rcT button[data-a="save"]');chk('saisie invalide refusée (salaire)',(await T('#rcM')).includes('entre 800')&&await e.locator('#rcM.bad').count()===1,await T('#rcM'));
+ await e.fill('#rcES','2100');await e.fill('#rcED','45');await e.click('#rcT button[data-a="save"]');chk('saisie invalide refusée (jours)',(await T('#rcM')).includes('entre 0 et 30'),await T('#rcM'));
+ await e.fill('#rcED','12');await e.click('#rcT button[data-a="save"]');chk('modification : statut à confirmer + historique',(await T('#rcV'))==='3 / 11'&&(await H0()).includes('Données modifiées : Hugo B.')&&(await e.locator('#rcT tr',{hasText:'Hugo B.'}).textContent()).includes('12 / 30'),await H0());
+ await e.selectOption('#rcT select[aria-label^="Signaler… — Karim D."]','arret');chk('signalement : arrêt de travail',(await T('#rcS'))==='3'&&(await H0()).includes('Arrêt de travail signalé : Karim D.'),await T('#rcS'));
+ await e.click('#rcT button[aria-label^="Lever le signalement — Élise G."]');chk('lever un signalement',(await T('#rcS'))==='2','');
+ await e.click('#rcT button[aria-label^="Actualiser — Nora A."]');chk('donnée obsolète actualisée',(await e.locator('#rcT tr',{hasText:'Nora A.'}).textContent()).includes('10 / 30')&&(await H0()).includes('Donnée actualisée'),'');
+ await e.click('#rcI');chk('import : nouveau dossier + dernière transmission',(await T('#rcV')).endsWith('/ 12')&&(await H0()).includes('Fichier d’exemple importé')&&!(await T('#rcL')).includes('26 oct'),await T('#rcL'));
+ await e.click('#rcA');chk('confirmation collective',(await T('#rcTo'))==='0'&&(await H0()).includes('Confirmation collective'),await T('#rcTo'));
+ const[dl]=await Promise.all([e.waitForEvent('download'),e.click('#rcX')]);const csvT=fs.readFileSync(await dl.path(),'utf8');chk('export CSV : en-tête et lignes',csvT.includes('"Salarié";"Fonction";"Contrat"')&&csvT.trim().split('\n').length===14,csvT.split('\n')[0]);
+ chk('confidentialité : aucune donnée d’avance, d’usage ni bancaire',!/avance|iban|compte/i.test(csvT.split('\n')[0])&&(await T('#console')).includes('ne montre pas'),'');
+ await e.click('#rcR');chk('réinitialisation',(await T('#rcV'))==='3 / 11'&&(await H0()).includes('Démonstration réinitialisée'),'');
+ chk('console : boutons et champs libellés',await e.evaluate(()=>[...document.querySelectorAll('#rcT button,#rcT select')].every(x=>x.getAttribute('aria-label'))&&!!document.querySelector('#rcF').getAttribute('aria-label')),'');await e.context().close()}
+// 22. disposition de la démo Salarié : calcul centré sous le téléphone, relié, sans débordement
+for(const w of[1280,390]){const v=await page('fr','#salarie',w);const g=await v.evaluate(()=>{const ph=document.querySelector('#slotS .phone').getBoundingClientRect(),ca=document.querySelector('#slotS .calc').getBoundingClientRect(),fr=document.querySelector('#slotS .frame').getBoundingClientRect();return{below:ca.top>=ph.bottom-2,cx:Math.abs((ca.left+ca.right)/2-(fr.left+fr.right)/2),inside:ca.left>=fr.left-1&&ca.right<=fr.right+1,ov:document.documentElement.scrollWidth<=innerWidth+1}});
+ chk('calcul sous le téléphone '+w,g.below&&g.inside&&g.ov,JSON.stringify(g));if(w>=900)chk('calcul centré dans le cadre',g.cx<20,g.cx);await v.context().close()}
+// 23. formats de nombres selon la langue
+for(const[l,re1,re2]of[['en',/\d,\d{3}/,/\d\u202f\d{3}/],['es',/\d\.\d{3}/,/\d\u202f\d{3}/],['it',/\d\.\d{3}/,/\d\u202f\d{3}/],['fr',/\d\u202f\d{3}/,/\d,\d{3}\b(?!\d)/]]){const q=await page(l,'#banque');const t=(await q.locator('#dashB #kp').first().textContent()).replace(/\u00a0/g,'\u202f');chk('format des nombres '+l,re1.test(t)&&!re2.test(t),t.slice(0,60));await q.context().close()}
+// 24. ordre des sections
+{const q=await page('fr','#entreprise'),o=await q.evaluate(()=>['console','role','parcours','implique','hr','contact-e'].map(i=>document.getElementById(i)).map(e=>e.getBoundingClientRect().top+scrollY));chk('entreprise : le temps RH vient après ce que l’intégration implique',o.every((v,i)=>i==0||v>o[i-1]),o.join());await q.context().close();
+ const r=await page('fr','#banque'),p2=await r.evaluate(()=>['dashB','meca','archi','eco','pilote'].map(i=>document.getElementById(i)).map(e=>e.getBoundingClientRect().top+scrollY));chk('banque : qui fait quoi juste après le circuit',p2.every((v,i)=>i==0||v>p2[i-1]),p2.join());await r.context().close()}
+// 25. hygiène du dépôt public : aucune donnée interne dans le site, README sans hypothèses internes
+{const idx=fs.readFileSync(path.resolve(__dirname,'..','index.html'),'utf8'),rd=fs.readFileSync(path.resolve(__dirname,'..','README.md'),'utf8');
+ chk('le site ne référence pas le modèle interne',!/modele-interne|interne\//.test(idx.replace(/const M=\{[\s\S]*?\};/,'')),'');chk('README sans hypothèses de coûts internes',!/coûts fixes|0,05 €|20 000 €\/mois/.test(rd),'');
+ chk('dossier interne et suivi privé absents du dépôt public',!fs.existsSync(path.resolve(__dirname,'..','interne'))&&!fs.existsSync(path.resolve(__dirname,'..','A-FOURNIR.md')),'');
+ const sm=fs.readFileSync(path.resolve(__dirname,'..','sitemap.xml'),'utf8'),sw=fs.readFileSync(path.resolve(__dirname,'..','sw.js'),'utf8');
+ chk('sitemap : 5 adresses (accueil, 3 parcours, app)',(sm.match(/<loc>/g)||[]).length===5&&!/interne/.test(sm),'');chk('sw.js : version datée de cette livraison',/earnly-v(9|\d\d)/.test(sw),sw.match(/VERSION = '[^']+'/)[0]);
+ const ids=new Set([...idx.matchAll(/ id="([^"]+)"/g)].map(m=>m[1])),bad=[...idx.replace(/const M=\{[\s\S]*?\};/,'').matchAll(/href="#([a-zA-Z][\w-]*)"/g)].map(m=>m[1]).filter(h=>!ids.has(h)&&!['salarie','entreprise','banque'].includes(h));chk('liens d’ancrage valides',bad.length===0,[...new Set(bad)].join());}
+
+// 26. console RH : aucun libellé français résiduel en EN / ES / IT (tableau, KPI, boutons, historique, rôles)
+for(const l of['en','es','it']){const q=await page(l,'#entreprise');await q.click('#rcI');const t=await q.locator('#consolesec').textContent();const fr=/(Dossiers|Signalements|Importer|Historique des actions|Qualité des données|Confirmer les dossiers|Actualiser|Salaire net de référence|Jours travaillés|Chargée|Magasinier|Développeuse|Technicienne|Non éligible|Rechercher|Fichier d’exemple importé|Dernière transmission|Cycle de paie)/;
+ chk('console traduite '+l,!fr.test(t),(t.match(fr)||[])[0]);await q.context().close()}
 console.log('OK',ok.length,'· KO',ko.length);ko.forEach(k=>console.log(' ✗',k));await b.close();process.exit(ko.length?1:0)})();
