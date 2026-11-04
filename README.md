@@ -9,6 +9,7 @@ Concept en développement : aucune banque connectée, aucune intégration de pai
 | Fichier | Rôle |
 |---|---|
 | `index.html` | Le site complet : trois parcours (Salarié, Entreprise, Banque), simulateurs, console RH simulée, tableau de bord bancaire fictif, formulaire, mentions légales |
+| `chatbot.js` | Assistant de questions-réponses (bouton en bas à droite), 4 langues, sans serveur ni API : voir « Chatbot » plus bas |
 | `app.html` | Aperçu du téléphone de la démo seul, plein écran |
 | `salarie.html`, `entreprise.html`, `banque.html` | Aperçu de partage propre à chaque public (titre, description, image), puis redirection vers `index.html#…` |
 | `favicon.png`, `og-image.png` | Icône de l'onglet et image de partage |
@@ -30,7 +31,7 @@ On peut aussi ouvrir `index.html` directement : tout fonctionne, sauf le service
 ## Mettre en ligne
 
 1. Déposer le contenu de ce dossier à la racine du dépôt GitHub Pages (remplacer les fichiers existants).
-2. **Après chaque modification du site**, changer `VERSION` dans `sw.js` (actuellement `earnly-v9`) : c'est ce qui force les visiteurs à recevoir la nouvelle version au lieu de l'ancienne gardée en cache.
+2. **Après chaque modification du site**, changer `VERSION` dans `sw.js` (actuellement `earnly-v10`) : c'est ce qui force les visiteurs à recevoir la nouvelle version au lieu de l'ancienne gardée en cache.
 3. Si un domaine personnalisé est branché, remplacer `https://earnlysite.github.io/EarnlyWS/` dans `index.html`, `salarie.html`, `entreprise.html`, `banque.html`, `sitemap.xml` et `robots.txt`.
 4. **Mentions légales** : compléter les passages entre crochets (`[à compléter]`, `[da completare]`, `[to be completed]`, `[por completar]`) dans `index.html` quand les informations seront disponibles, puis faire relire le texte par un juriste.
 5. **Formulaire de contact** : les messages partent vers l'adresse du porteur du projet, sans qu'elle soit affichée. Au premier envoi test depuis le vrai domaine, le service de relais FormSubmit envoie un e-mail de confirmation à cette adresse : cliquer sur le lien pour l'activer. Tant que ce n'est pas fait, le site ouvre la messagerie du visiteur avec le message pré-rempli.
@@ -43,6 +44,16 @@ node tests/earnly.test.js
 ```
 
 La suite charge le site dans un vrai navigateur (Chromium) et contrôle notamment : les erreurs console dans les 4 langues et les 3 parcours ; les agrégats du tableau de bord recalculés indépendamment (30 j, 90 j, 12 mois) ; l'export CSV, les paramètres et la réinitialisation ; la simulation bancaire contre des valeurs calculées à la main ; la **console RH simulée** (confirmation, recherche, filtres, modification avec contrôle des saisies, signalements, actualisation, import et export fictifs, historique, confidentialité) ; l'**intro illustrée** (dessin réel, passage, fin automatique, respect de « réduire les animations ») ; la disposition de la démo Salarié ; les formats de nombres par langue ; l'ordre des sections ; les traductions des blocs ajoutés ; l'absence de défilement horizontal sur mobile ; les contrastes, le lien d'évitement et l'accessibilité clavier ; le sitemap, le service worker et les liens d'ancrage. Elle ne teste ni l'envoi réel du formulaire (réseau) ni l'ouverture du CSV dans Excel.
+
+## Chatbot
+
+`chatbot.js` ajoute un bouton « Poser une question » en bas à droite de `index.html` (chargé par une balise `<script src="chatbot.js" defer>` en fin de page). C'est un assistant **local** : il tourne dans le navigateur, n'appelle aucune API, n'envoie ni n'enregistre rien (seul l'historique de la conversation reste dans `sessionStorage`, effacé à la fermeture de l'onglet).
+
+- **Contenu** : 15 sujets (principe, disponibilité, plafond, frais, remboursement, données, éligibilité, changement de situation, rôle de l'entreprise, coût entreprise, banque et modèle, pilote, risque, cadre juridique, contact), dans les 4 langues, rédigés à partir du texte du site. Il ne promet rien que le site ne dise pas : concept, données fictives, aucun partenaire signé, aucun conseil financier ou juridique.
+- **Calculs** : il sait calculer à la demande (« frais pour 450 € », « 2 000 € et 12 jours ») avec les mêmes règles que la simulation (40 %, 0,20 % / 0,70 %, mois de 30 jours).
+- **Contexte** : les boutons de suggestion dépendent du parcours affiché (Salarié, Entreprise, Banque) et proposent d'ouvrir la page concernée.
+- **Modifier** : éditer `TOPICS` (réponses `a`, mots-clés `k`, libellés `l`) et `CFG` (taux) en haut de `chatbot.js`. Si les taux ou le plafond changent dans `index.html`, les changer aussi dans `CFG` et dans les textes.
+- **Accessibilité** : dialogue au clavier (Échap pour fermer, focus piégé), annonce des réponses aux lecteurs d'écran, « réduire les animations » respecté, plein écran sur mobile.
 
 ## Fonctionnement
 
