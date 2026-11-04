@@ -1,5 +1,5 @@
-/* Earnly : assistant de questions-réponses (chatbot local, sans serveur, sans API, sans collecte).
-   Il répond uniquement à partir du contenu du site, dans la langue choisie (fr, en, es, it).
+/* Earnly : assistant hybride. Le mode local fonctionne sans serveur ni API ; un Worker sécurisé
+   peut être configuré en option pour les questions libres. Les réponses suivent la langue choisie (fr, en, es, it).
    Pour modifier une réponse : éditez le sujet correspondant dans TOPICS (champ a). Pour ajouter un sujet : ajoutez un objet à TOPICS.
    Les chiffres (40 %, 0,20 %, 0,70 %) sont lus dans CFG ci-dessous : gardez-les alignés avec index.html. */
 (() => {
@@ -14,25 +14,33 @@
 
   /* ---------- Textes de l'interface ---------- */
   const UI = {
-    fr: { open: 'Poser une question', close: 'Fermer', title: 'Assistant Earnly', sub: 'Répond à partir du contenu du site', ph: 'Votre question…', send: 'Envoyer', clear: 'Nouvelle conversation',
+    fr: { open: 'Poser une question', close: 'Fermer', title: 'Assistant Earnly', sub: 'Posez votre question, même avec des fautes', ph: 'Votre question…', send: 'Envoyer', clear: 'Nouvelle conversation',
       hello: 'Bonjour ! Je réponds à vos questions sur Earnly : le principe, les frais, le remboursement, les données, le rôle de l’entreprise ou de la banque. Earnly est un concept en conception, avec des données fictives.',
-      note: 'Assistant automatique : il ne donne ni conseil financier ni conseil juridique. Aucune de vos saisies n’est transmise ni enregistrée.',
-      fb: 'Je n’ai pas trouvé de réponse précise à cette question dans le contenu du site. Essayez avec d’autres mots, ou choisissez un sujet ci-dessous.',
+      note: 'Assistant automatique. Messages conservés dans cet onglet uniquement ; aucun envoi au serveur. Pas de conseil financier ou juridique.',
+      fb: 'Je peux répondre sur Earnly, son fonctionnement et les hypothèses du projet, mais je n’ai pas trouvé de réponse fiable à cette question. Reformulez-la ou choisissez un sujet ci-dessous.',
+      found: 'Voici le passage du site qui semble le plus proche de votre question :',
+      noteAI: 'Avec l’IA activée, les questions libres sont transmises au service configuré ; les calculs restent locaux. N’envoyez aucune donnée bancaire, de paie ou sensible.',
       thanks: 'Avec plaisir ! D’autres questions ?', bye: 'À bientôt !', more: 'Pour aller plus loin :', typing: 'L’assistant écrit…', views: { s: 'Page Salarié', e: 'Page Entreprise', b: 'Page Banque' } },
-    en: { open: 'Ask a question', close: 'Close', title: 'Earnly assistant', sub: 'Answers from the site’s content', ph: 'Your question…', send: 'Send', clear: 'New conversation',
+    en: { open: 'Ask a question', close: 'Close', title: 'Earnly assistant', sub: 'Ask naturally, even with typos', ph: 'Your question…', send: 'Send', clear: 'New conversation',
       hello: 'Hello! I can answer questions about Earnly: the principle, fees, repayment, data, and the role of the employer or the bank. Earnly is a concept in design, with fictional data.',
-      note: 'Automatic assistant: it gives no financial or legal advice. Nothing you type is sent or stored.',
-      fb: 'I couldn’t find a precise answer to that in the site’s content. Try different words, or pick a topic below.',
+      note: 'Automatic assistant. Messages stay in this browser tab; nothing is sent to a server. No financial or legal advice.',
+      fb: 'I can answer questions about Earnly and the project assumptions, but I could not find a reliable answer to this question. Rephrase it or choose a topic below.',
+      found: 'This is the passage on the site that seems closest to your question:',
+      noteAI: 'With AI enabled, free-form questions are sent to the configured AI service; calculations stay local. Do not send bank, payroll or sensitive data.',
       thanks: 'My pleasure! Any other questions?', bye: 'See you soon!', more: 'To go further:', typing: 'The assistant is typing…', views: { s: 'Employee page', e: 'Company page', b: 'Bank page' } },
-    es: { open: 'Hacer una pregunta', close: 'Cerrar', title: 'Asistente Earnly', sub: 'Responde con el contenido del sitio', ph: 'Su pregunta…', send: 'Enviar', clear: 'Nueva conversación',
+    es: { open: 'Hacer una pregunta', close: 'Cerrar', title: 'Asistente Earnly', sub: 'Pregunte con naturalidad, incluso con errores', ph: 'Su pregunta…', send: 'Enviar', clear: 'Nueva conversación',
       hello: '¡Hola! Respondo a sus preguntas sobre Earnly: el principio, las comisiones, el reembolso, los datos y el papel de la empresa o del banco. Earnly es un concepto en diseño, con datos ficticios.',
-      note: 'Asistente automático: no ofrece asesoramiento financiero ni jurídico. Nada de lo que escriba se envía ni se guarda.',
-      fb: 'No he encontrado una respuesta precisa en el contenido del sitio. Pruebe con otras palabras o elija un tema abajo.',
+      note: 'Asistente automático. Los mensajes permanecen en esta pestaña; no se envían a ningún servidor. Sin asesoramiento financiero ni jurídico.',
+      fb: 'Puedo responder sobre Earnly y las hipótesis del proyecto, pero no he encontrado una respuesta fiable. Reformule la pregunta o elija un tema.',
+      found: 'Este es el pasaje del sitio que parece más relacionado con su pregunta:',
+      noteAI: 'Con la IA activada, las preguntas libres se envían al servicio configurado; los cálculos permanecen locales. No envíe datos bancarios, de nómina ni sensibles.',
       thanks: '¡Con gusto! ¿Alguna otra pregunta?', bye: '¡Hasta pronto!', more: 'Para saber más:', typing: 'El asistente está escribiendo…', views: { s: 'Página Empleado', e: 'Página Empresa', b: 'Página Banco' } },
-    it: { open: 'Fai una domanda', close: 'Chiudi', title: 'Assistente Earnly', sub: 'Risponde con i contenuti del sito', ph: 'La sua domanda…', send: 'Invia', clear: 'Nuova conversazione',
+    it: { open: 'Fai una domanda', close: 'Chiudi', title: 'Assistente Earnly', sub: 'Fai la tua domanda, anche con errori', ph: 'La sua domanda…', send: 'Invia', clear: 'Nuova conversazione',
       hello: 'Buongiorno! Rispondo alle sue domande su Earnly: il principio, i costi, il rimborso, i dati e il ruolo dell’azienda o della banca. Earnly è un concept in progettazione, con dati fittizi.',
-      note: 'Assistente automatico: non fornisce consulenza finanziaria né legale. Nulla di ciò che scrive viene inviato o salvato.',
-      fb: 'Non ho trovato una risposta precisa nei contenuti del sito. Provi con altre parole o scelga un argomento qui sotto.',
+      note: 'Assistente automatico. I messaggi restano in questa scheda; non vengono inviati a un server. Nessuna consulenza finanziaria o legale.',
+      fb: 'Posso rispondere su Earnly e sulle ipotesi del progetto, ma non ho trovato una risposta affidabile. Riformuli la domanda o scelga un argomento.',
+      found: 'Ecco il passaggio del sito che sembra più vicino alla sua domanda:',
+      noteAI: 'Con l’IA attivata, le domande libere vengono inviate al servizio configurato; i calcoli restano locali. Non invii dati bancari, retributivi o sensibili.',
       thanks: 'Con piacere! Altre domande?', bye: 'A presto!', more: 'Per approfondire:', typing: 'L’assistente sta scrivendo…', views: { s: 'Pagina Dipendente', e: 'Pagina Azienda', b: 'Pagina Banca' } }
   }[L];
 
@@ -40,7 +48,7 @@
      id, v (parcours concerné), k (radicaux de mots-clés, séparés par |, sans accents), l (libellé du bouton), a (réponse), go (vue à ouvrir) */
   const TOPICS = [
     { id: 'what', v: 'sebd', go: 's',
-      k: { fr: 'earnly|c est quoi|principe|concept|a quoi ca sert|presente|fonctionne|comment ca marche|avance sur salaire|salaire gagne', en: 'earnly|what is|principle|concept|how does it work|how it works|salary advance|earned wage|earned salary|what do you do', es: 'earnly|que es|principio|concepto|como funciona|adelanto|salario ganado', it: 'earnly|cos e|principio|concept|come funziona|anticipo|stipendio maturato' },
+      k: { fr: 'earnly|c est quoi|c koi|koi|principe|concept|a quoi ca sert|presente|fonctionne|comment ca marche|cmt ca marche|avance sur salaire|salaire gagne', en: 'earnly|what is|principle|concept|how does it work|how it works|salary advance|earned wage|earned salary|what do you do', es: 'earnly|que es|principio|concepto|como funciona|adelanto|salario ganado', it: 'earnly|cos e|principio|concept|come funziona|anticipo|stipendio maturato' },
       l: { fr: 'C’est quoi, Earnly ?', en: 'What is Earnly?', es: '¿Qué es Earnly?', it: 'Che cos’è Earnly?' },
       a: { fr: 'Chaque jour travaillé vous rapporte une part de salaire, versée plus tard. Earnly calcule ce que vous avez déjà gagné et, avec une banque partenaire, vous permettrait d’en recevoir une partie avant la date de paie, sans changer cette date. Ce n’est pas une banque : Earnly ne manipule aucun fonds.',
         en: 'Every day you work earns you a share of salary that is paid later. Earnly calculates what you have already earned and, with a partner bank, would let you receive part of it before payday, without changing the payday itself. Earnly is not a bank and never handles any funds.',
@@ -49,12 +57,12 @@
     { id: 'status', v: 'sebd', go: 's',
       k: { fr: 'disponible|dispo|existe|reel|vrai|souscrire|telecharger|lancement|lance|partenaire signe|banque partenaire|fictif|demo|essayer|utiliser|ouvert|date', en: 'available|exist|real|subscribe|download|launch|signed|partner bank|fictional|fake|demo|try|use it|when|live', es: 'disponible|existe|real|suscribir|descargar|lanzamiento|firmado|banco socio|ficticio|demo|probar|usar|cuando', it: 'disponibile|esiste|reale|sottoscrivere|scaricare|lancio|firmato|banca partner|fittizio|demo|provare|usare|quando' },
       l: { fr: 'Est-ce disponible ?', en: 'Is it available?', es: '¿Está disponible?', it: 'È disponibile?' },
-      a: { fr: 'Pas encore. Earnly est un concept en conception : aucune banque n’est connectée, aucune intégration de paie n’est active, aucun partenaire n’est signé. La démonstration du site utilise des données fictives, rien n’est enregistré ni transmis et aucune demande réelle ne peut être faite ici.',
-        en: 'Not yet. Earnly is a concept in design: no bank is connected, no payroll integration is active and no partner has signed. The demo on this site uses fictional data, nothing is saved or sent, and no real request can be made here.',
-        es: 'Todavía no. Earnly es un concepto en diseño: no hay ningún banco conectado, ninguna integración de nómina activa ni ningún socio firmado. La demo usa datos ficticios, no se guarda ni se envía nada y aquí no se puede hacer ninguna solicitud real.',
-        it: 'Non ancora. Earnly è un concept in progettazione: nessuna banca collegata, nessuna integrazione paghe attiva, nessun partner firmato. La demo usa dati fittizi, nulla viene salvato o inviato e qui non si può fare alcuna richiesta reale.' } },
+      a: { fr: 'Pas encore. Earnly est un concept en conception : aucune banque n’est connectée, aucune intégration de paie n’est active, aucun partenaire n’est signé. La démonstration du site utilise des données fictives et aucune demande réelle ne peut être faite ici.',
+        en: 'Not yet. Earnly is a concept in design: no bank is connected, no payroll integration is active and no partner has signed. The demo on this site uses fictional data and no real request can be made here.',
+        es: 'Todavía no. Earnly es un concepto en diseño: no hay ningún banco conectado, ninguna integración de nómina activa ni ningún socio firmado. La demo usa datos ficticios y aquí no se puede hacer ninguna solicitud real.',
+        it: 'Non ancora. Earnly è un concept in progettazione: nessuna banca collegata, nessuna integrazione paghe attiva, nessun partner firmato. La demo usa dati fittizi e qui non si può fare alcuna richiesta reale.' } },
     { id: 'cap', v: 's', go: 's',
-      k: { fr: 'combien|plafond|40|maximum|montant|limite|jusqu a|accessible|pourcentage', en: 'how much|cap|ceiling|40|maximum|limit|up to|accessible|percentage|amount', es: 'cuanto|limite|tope|40|maximo|importe|hasta|accesible|porcentaje', it: 'quanto|massimale|tetto|40|massimo|importo|fino a|accessibile|percentuale' },
+      k: { fr: 'combien|plafond|40|maximum|montant|limite|jusqu a|accessible|pourcentage', en: 'cap|ceiling|40|maximum|limit|up to|accessible|percentage|amount', es: 'cuanto|limite|tope|40|maximo|importe|hasta|accesible|porcentaje', it: 'quanto|massimale|tetto|40|massimo|importo|fino a|accessibile|percentuale' },
       l: { fr: 'Combien puis-je avoir ?', en: 'How much could I get?', es: '¿Cuánto podría recibir?', it: 'Quanto potrei ottenere?' },
       a: { fr: 'Jusqu’à 40 % du salaire déjà gagné dans le mois, calculé sur votre salaire net de référence (hors primes variables). Exemple : 2 400 € de salaire net et 10 jours travaillés sur 30 donnent 800 € gagnés, soit jusqu’à 320 € accessibles. Le plafond de 40 % est une hypothèse de travail, ni une limite légale ni une garantie. Écrivez-moi votre salaire et vos jours (« 2 000 et 12 jours ») et je calcule.',
         en: 'Up to 40% of the salary already earned in the month, based on your reference net salary (excluding variable bonuses). Example: a net salary of €2,400 and 10 days worked out of 30 gives €800 earned, so up to €320 accessible. The 40% cap is a working assumption, neither a legal limit nor a guarantee. Tell me your salary and days (“2000 and 12 days”) and I’ll calculate.',
@@ -75,12 +83,12 @@
         es: 'Su salario se abona con normalidad. El día de pago, el banco adeuda el adelanto y las comisiones en su cuenta, según el mandato SEPA aceptado. Si el saldo es insuficiente, el adeudo se rechaza, se suspenden los nuevos adelantos y el banco propone una regularización. Es una decisión de diseño, no contratada ni activada.',
         it: 'Il suo stipendio viene versato normalmente. Il giorno della paga la banca addebita anticipo e costi sul suo conto, secondo il mandato SEPA accettato. Se il saldo è insufficiente, l’addebito viene respinto, i nuovi anticipi sono sospesi e la banca propone una regolarizzazione. È una scelta di progetto, non contrattualizzata né attiva.' } },
     { id: 'data', v: 'seb', go: 's',
-      k: { fr: 'donnee|confidential|rgpd|vie privee|prive|voit|voir|banc|collect|securite|secret', en: 'data|privacy|gdpr|private|see|sees|bank details|collect|security|confidential', es: 'dato|privacidad|rgpd|privado|ve |ven |bancari|recopil|seguridad|confidencial', it: 'dati|privacy|gdpr|privato|vede|bancari|raccol|sicurezza|riservat' },
+      k: { fr: 'donnee|confidential|rgpd|vie privee|prive|voit|voir|banc|collect|securite|secret|historique|avance|habitude', en: 'data|privacy|gdpr|private|see|sees|bank details|collect|security|confidential|history|advance|usage', es: 'dato|privacidad|rgpd|privado|ve |ven |bancari|recopil|seguridad|confidencial|historial|adelanto|uso', it: 'dati|privacy|gdpr|privato|vede|bancari|raccol|sicurezza|riservat|storico|anticipo|utilizzo' },
       l: { fr: 'Et mes données ?', en: 'What about my data?', es: '¿Y mis datos?', it: 'E i miei dati?' },
-      a: { fr: 'Votre employeur confirme votre emploi, votre salaire de référence et vos jours travaillés, et rien de plus. Par défaut, il ne voit ni l’historique de vos demandes, ni vos habitudes d’utilisation, ni vos informations bancaires. Aucune donnée bancaire ni analyse de dépenses n’est demandée. Ce site ne collecte rien, sauf via le formulaire de contact. Les durées de conservation et les rôles RGPD restent à définir, et aucune certification n’est revendiquée.',
-        en: 'Your employer confirms your employment, reference salary and days worked, and nothing more. By default it sees neither your request history, nor your usage habits, nor your bank details. No bank data or spending analysis is requested. This site collects nothing except through the contact form. Retention periods and GDPR roles are still to be defined, and no certification is claimed.',
-        es: 'Su empleador confirma su empleo, su salario de referencia y sus días trabajados, y nada más. Por defecto no ve el historial de sus solicitudes, sus hábitos de uso ni sus datos bancarios. No se pide ningún dato bancario ni análisis de gastos. Este sitio no recopila nada, salvo mediante el formulario de contacto. Los plazos de conservación y los roles RGPD están por definir y no se reclama ninguna certificación.',
-        it: 'Il suo datore di lavoro conferma impiego, stipendio di riferimento e giorni lavorati, nulla di più. Per impostazione predefinita non vede né lo storico delle richieste, né le sue abitudini d’uso, né i dati bancari. Non vengono richiesti dati bancari né analisi delle spese. Questo sito non raccoglie nulla, salvo tramite il modulo di contatto. Tempi di conservazione e ruoli GDPR sono ancora da definire e nessuna certificazione è dichiarata.' } },
+      a: { fr: 'Dans le modèle envisagé, l’employeur confirmerait votre emploi, votre salaire de référence et vos jours travaillés. Il n’aurait pas vocation à voir l’historique de vos avances, vos habitudes d’utilisation ni vos informations bancaires. Le site ne demande aucune donnée bancaire ni analyse de dépenses. Dans cette démonstration, l’historique du chatbot est conservé temporairement dans le stockage de session de votre onglet. En mode local, vos questions ne sont pas envoyées à un serveur. Si le mode IA facultatif est activé, les questions libres et les derniers échanges sont transmis au relais configuré puis à l’API d’OpenAI. Ne saisissez aucune donnée bancaire, de paie ou sensible. La conservation, les rôles RGPD et les mesures de sécurité du futur service restent à définir ; aucune certification n’est revendiquée.',
+        en: 'In the envisaged model, the employer would confirm your employment, reference salary and days worked. The employer would not be intended to see your advance history, usage habits or bank details. The site does not request bank details or spending analysis. In this demo, chatbot history is kept temporarily in your tab’s session storage. In local mode, your questions are not sent to a server. If optional AI mode is enabled, free-form questions and recent exchanges are sent to the configured relay and then to the OpenAI API. Do not enter bank details, payroll data or other sensitive information. Retention, GDPR roles and security measures for the future service remain to be defined; no certification is claimed.',
+        es: 'En el modelo previsto, el empleador confirmaría su empleo, su salario de referencia y los días trabajados. No estaría previsto que pudiera ver el historial de sus adelantos, sus hábitos de uso ni sus datos bancarios. El sitio no solicita datos bancarios ni análisis de gastos. En esta demostración, el historial del chatbot se conserva temporalmente en el almacenamiento de sesión de la pestaña. En modo local, sus preguntas no se envían a ningún servidor. Si se activa el modo IA opcional, las preguntas libres y los últimos intercambios se envían al relé configurado y después a la API de OpenAI. No introduzca datos bancarios, de nómina ni otra información sensible. La conservación, los roles RGPD y las medidas de seguridad del futuro servicio aún deben definirse; no se reclama ninguna certificación.',
+        it: 'Nel modello previsto, il datore di lavoro confermerebbe il suo impiego, lo stipendio di riferimento e i giorni lavorati. Non sarebbe previsto che possa vedere lo storico degli anticipi, le abitudini di utilizzo o i dati bancari. Il sito non richiede dati bancari né analisi delle spese. In questa dimostrazione, la cronologia del chatbot viene conservata temporaneamente nella memoria di sessione della scheda. In modalità locale, le sue domande non vengono inviate a un server. Se viene attivata la modalità IA facoltativa, le domande libere e gli ultimi scambi vengono inviati al relay configurato e poi all’API di OpenAI. Non inserisca dati bancari, retributivi o altre informazioni sensibili. Conservazione, ruoli GDPR e misure di sicurezza del futuro servizio restano da definire; nessuna certificazione è dichiarata.' } },
     { id: 'elig', v: 's', go: 's',
       k: { fr: 'eligib|cdi|cdd|interim|qui peut|conditions|prime|variable|independant|stagiaire', en: 'eligib|permanent|fixed-term|temp|who can|conditions|bonus|variable|freelance|intern', es: 'eligib|indefinid|temporal|quien puede|condiciones|prima|variable|autonomo|becario', it: 'idone|indeterminat|determinat|interinale|chi puo|condizioni|premio|variabile|autonomo|stagista' },
       l: { fr: 'Qui est éligible ?', en: 'Who is eligible?', es: '¿Quién es elegible?', it: 'Chi è idoneo?' },
@@ -152,17 +160,138 @@
     bye: { fr: 'au revoir|a bientot|bye|salut a|ciao', en: 'goodbye|bye|see you', es: 'adios|hasta luego|chao', it: 'arrivederci|addio|a presto' }
   };
 
-  const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[’'`]/g, ' ').replace(/[^a-z0-9,.% \/€-]/g, ' ').replace(/\s+/g, ' ').trim();
-  const hit = (m, list) => list.split('|').some(w => w && (' ' + m).includes(' ' + w));
-  const score = (m, t) => t.k[L].split('|').reduce((n, w) => n + ((' ' + m).includes(' ' + w) ? (w.length > 5 ? 2 : 1) : 0), 0);
-  const nums = s => (s.match(/\d{1,3}(?:[ \u00a0\u202f]\d{3})+(?:[.,]\d+)?|\d+(?:[.,]\d+)?/g) || []).map(x => parseFloat(x.replace(/[ \u00a0\u202f]/g, '').replace(/\.(?=\d{3}$)/, '').replace(',', '.'))).filter(n => isFinite(n));
+  /* ---------- Compréhension tolérante aux fautes ----------
+     Le chatbot reste local : pas d'API, pas de clé secrète dans le dépôt.
+     On combine synonymes/mots-clés, rapprochement orthographique et recherche
+     dans les textes réellement présents sur les trois parcours du site. */
+  const norm = s => String(s || '').toLocaleLowerCase().normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '').replace(/[’'`]/g, ' ')
+    .replace(/[^a-z0-9,.% \/€-]/g, ' ').replace(/\s+/g, ' ').trim();
+  const words = s => norm(s).match(/[a-z0-9]+/g) || [];
+  const hit = (m, list) => list.split('|').some(w => w && (' ' + m + ' ').includes(' ' + norm(w) + ' '));
+  const STOP = {
+    fr: 'a au aux avec ce ceci cela ces cette c est cest comment fonctionne dans de des du elle en et eux il ils je la le les leur lui ma mais me mes moi mon ne nos notre nous on ou par pas pour pourquoi que quel quelle quels quelles qui quoi sa se ses si son sous sur ta te tes toi ton tous tout un une vos votre vous y',
+    en: 'a about after all also am an and any are as at be because been before being but by can could did do does doing for from had has have he her hers him his how i if in into is it its just me my of on or our ours she should so than that the their them then there these they this those to too up us was we were what when where which who why will with would you your yours',
+    es: 'a al algo como con cual cuando de del desde donde el ella ellas ellos en es esa ese eso esta este esto fue ha hasta hay la las le les lo los mas mi mientras muy no nos o para pero por porque que se ser si sin su sus te tu tus un una unos unas y ya yo',
+    it: 'a ad che chi ci come cosa cui da dal dalla dalle dagli dei del della delle di e ed è era essere gli ha hai hanno i il in io la le lei lo lui ma mi miei mio ne nei nel nella no noi non o per perché più quale quando quanto quella quelle quello questi questo si sono su sul sulla tra tu tua tue tuo un una uno vi voi'
+  };
+  const STOP_SET = new Set((STOP[L] || STOP.fr).split(' '));
+  const meaningful = s => words(s).filter(w => !STOP_SET.has(w) && !/^\d+(?:[.,]\d+)?$/.test(w) && (w.length >= 3 || /^(cdi|cdd|api|sepa)$/.test(w)));
+
+  function editDistance(a, b, limit) {
+    if (Math.abs(a.length - b.length) > limit) return limit + 1;
+    let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+    for (let i = 1; i <= a.length; i++) {
+      const cur = [i]; let rowMin = i;
+      for (let j = 1; j <= b.length; j++) {
+        cur[j] = Math.min(cur[j - 1] + 1, prev[j] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+        rowMin = Math.min(rowMin, cur[j]);
+      }
+      if (rowMin > limit) return limit + 1;
+      prev = cur;
+    }
+    return prev[b.length];
+  }
+  function wordSimilarity(a, b) {
+    if (a === b) return 1;
+    if (a.length < 4 || b.length < 4) return 0;
+    const short = a.length <= b.length ? a : b, long = a.length > b.length ? a : b;
+    if (short.length >= 4 && long.startsWith(short) && long.length - short.length <= 4) return .82;
+    const max = Math.max(a.length, b.length), d = editDistance(a, b, max >= 8 ? 2 : 1);
+    if (d === 1) return .78;
+    if (d === 2 && max >= 8) return .66;
+    return 0;
+  }
+  const TOPIC_WORDS = TOPICS.map(t => [...new Set(t.k[L].split('|').flatMap(words).filter(w => w.length >= 3 || /^(cdi|cdd|api|sepa)$/.test(w)))]);
+  const DOC_FREQ = new Map();
+  TOPIC_WORDS.forEach(arr => new Set(arr).forEach(w => DOC_FREQ.set(w, (DOC_FREQ.get(w) || 0) + 1)));
+  function hasFuzzyToken(m, candidates) {
+    const q = meaningful(m), c = candidates.split('|').flatMap(words);
+    return q.some(qw => c.some(cw => wordSimilarity(qw, cw) >= .66));
+  }
+  function score(m, t) {
+    const q = meaningful(m), ix = TOPICS.indexOf(t), keys = TOPIC_WORDS[ix] || [];
+    if (!q.length || !keys.length) return 0;
+    let total = 0;
+    q.forEach(qw => {
+      let best = 0, bestKey = '';
+      keys.forEach(kw => { const sim = wordSimilarity(qw, kw); if (sim > best) { best = sim; bestKey = kw; } });
+      if (best >= .66) {
+        const idf = 1 + Math.log((TOPICS.length + 1) / ((DOC_FREQ.get(bestKey) || 1) + 1));
+        total += best * idf;
+      }
+    });
+    const padded = ' ' + norm(m) + ' ';
+    t.k[L].split('|').forEach(phrase => {
+      const p = norm(phrase);
+      if (p.length >= 5 && padded.includes(' ' + p + ' ')) total += 2.2 + Math.min(words(p).length, 3) * .25;
+    });
+    /* Les mots d'intention dominent les mots génériques comme « comment » ou « combien ». */
+    const id = t.id;
+    if (id === 'fee' && hasFuzzyToken(m, 'frais|cout|coute|prix|tarif|commission|payer|payant|gratuit|fee|cost|price|charge|comision|costo|costi|prezzo|tariffa')) total += 5.2;
+    if (id === 'cap' && hasFuzzyToken(m, 'cout|coute|prix|tarif|commission|fee|cost|price|costo|prezzo|tariffa')) total -= 3.0;
+    if (id === 'repay' && hasFuzzyToken(m, 'rembours|remboursement|rembourser|prelevement|prelever|debit|sepa|mandat|rejet|solde|echeance|refund|repay|reembolso|rimborso|addebito|devuelve|devolver|devolucion|devolucion|pago|cobro|cargo|descontar|rimborso|restituire')) total += 5.0;
+    if (id === 'what' && hasFuzzyToken(m, 'rembours|remboursement|prelevement|debit|sepa|mandat|refund|repay|reembolso|rimborso|addebito|devuelve|devolver|devolucion|cobro|cargo')) total -= 3.0;
+    if (id === 'ecost' && hasFuzzyToken(m, 'entreprise|employeur|societe|rh|company|employer|empresa|azienda') && hasFuzzyToken(m, 'cout|coute|prix|tarif|abonnement|licence|cost|price|subscription|costo|coste|cuesta|costa|prezzo|combien|cuanto|quanto|much')) total += 9.0;
+    if ((id === 'employer' || id === 'fee' || id === 'cap') && hasFuzzyToken(m, 'entreprise|employeur|societe|rh|company|employer|empresa|azienda') && hasFuzzyToken(m, 'cout|coute|prix|tarif|abonnement|licence|cost|price|subscription|costo|coste|cuesta|costa|prezzo|combien|cuanto|quanto|much')) total -= 3.0;
+    if (id === 'employer' && hasFuzzyToken(m, 'entreprise|employeur|societe|rh|paie|payroll|company|employer|empresa|azienda|integra|integration|logiciel|software')) total += 1.8;
+    if (id === 'bank' && hasFuzzyToken(m, 'banque|bancaire|banquier|bank|banco|banca|financement')) total += 1.8;
+    if (id === 'bank' && hasFuzzyToken(m, 'integration|api|connecteur|interface|architecture|technique|application')) total += 4.0;
+    if (id === 'employer' && hasFuzzyToken(m, 'employeur|entreprise|societe|rh|paie|payroll|logiciel|software')) total += 2.0;
+    if (id === 'legal' && hasFuzzyToken(m, 'legal|juridique|loi|reglement|reglementaire|conformite|autorisation|licence|law|compliance|legale')) total += 4.2;
+    if (id === 'risk' && hasFuzzyToken(m, 'risque|risques|perte|impaye|impayes|incident|recouvrement|responsabilite|control|risk|loss|default')) total += 4.2;
+    if (id === 'data' && hasFuzzyToken(m, 'donnee|donnees|confidentialite|vie privee|rgpd|gdpr|privacy|data|seguridad|sicurezza')) total += 2.8;
+    if (id === 'data' && hasFuzzyToken(m, 'employeur|entreprise|rh|employer|company|empleador|empresa|datore|azienda') && hasFuzzyToken(m, 'voir|voit|see|sees|ver|ve|vede') && hasFuzzyToken(m, 'avance|avances|historique|history|adelanto|anticipi|anticipo')) total += 7.0;
+    if (id === 'employer' && hasFuzzyToken(m, 'employeur|employer|empleador|datore') && hasFuzzyToken(m, 'voir|voit|see|sees|ver|vede') && hasFuzzyToken(m, 'avance|avances|historique|history|adelanto|anticipo')) total -= 2.0;
+    if (id === 'what' && hasFuzzyToken(m, 'earnly') && hasFuzzyToken(m, 'banque|bank|banco|banca') && hasFuzzyToken(m, 'vrai|vraie|reel|reelle|true|real|verdadera|vera')) total += 8.0;
+    if (id === 'bank' && hasFuzzyToken(m, 'earnly') && hasFuzzyToken(m, 'vrai|vraie|reel|reelle|true|real|verdadera|vera')) total -= 3.0;
+    if (id === 'status' && hasFuzzyToken(m, 'disponible|dispo|lancement|lance|inscrire|inscription|utiliser|telecharger|existe|partenaire|available|launch|sign up')) total += 2.5;
+    if (id === 'cap' && hasFuzzyToken(m, 'plafond|maximum|max|limite|montant|accessible|avance|pourcentage|combien|how much|limite|massimale')) total += 1.4;
+    return total;
+  }
+  const nums = s => (String(s).match(/\d{1,3}(?:[ \u00a0\u202f]\d{3})+(?:[.,]\d+)?|\d+(?:[.,]\d+)?/g) || []).map(x => parseFloat(x.replace(/[ \u00a0\u202f]/g, '').replace(/\.(?=\d{3}$)/, '').replace(',', '.'))).filter(n => isFinite(n));
+
+  /* Recherche de secours dans les contenus réellement rédigés sur le site.
+     Elle renvoie un extrait, jamais une réponse inventée. */
+  let SITE_TEXT_INDEX = null;
+  function getSiteTextIndex() {
+    if (SITE_TEXT_INDEX) return SITE_TEXT_INDEX;
+    const selectors = 'main.view h1, main.view h2, main.view h3, main.view p, main.view li, main.view td, main.view dt, main.view dd, main.view summary';
+    const seen = new Set(), out = [];
+    document.querySelectorAll(selectors).forEach(el => {
+      const raw = (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim();
+      if (raw.length < 45 || raw.length > 900 || seen.has(raw)) return;
+      seen.add(raw);
+      raw.split(/(?<=[.!?])\s+(?=[A-ZÀ-ÖØ-Þ0-9])/u).forEach(part => {
+        const text = part.trim(); if (text.length >= 45 && text.length <= 460) out.push({ text, tokens: meaningful(text) });
+      });
+    });
+    SITE_TEXT_INDEX = out;
+    return out;
+  }
+  function searchSite(raw) {
+    const q = meaningful(raw); if (q.length < 2) return null;
+    let best = null, bestScore = 0;
+    getSiteTextIndex().forEach(doc => {
+      if (!doc.tokens.length) return;
+      let s = 0, found = 0;
+      q.forEach(qw => {
+        let sim = 0; doc.tokens.forEach(dw => { sim = Math.max(sim, wordSimilarity(qw, dw)); });
+        if (sim >= .66) { s += sim; found++; }
+      });
+      const adjusted = s / Math.sqrt(Math.max(1, doc.tokens.length / 7));
+      if (found >= 2 && adjusted > bestScore) { bestScore = adjusted; best = doc.text; }
+    });
+    return best && bestScore >= 1.05 ? best.slice(0, 420) : null;
+  }
 
   /* ---------- Calculs à la demande ---------- */
   const R2 = n => Math.round(n * 100) / 100;
   function calc(raw, m) {
     const n = nums(raw);
-    const dayW = /jour|day|dia|giorn|\bj\b/.test(m), feeW = hit(m, 'frais|fee|cost|cout|coste|comision|costi|tarif');
-    if (n.length >= 2 && dayW && !feeW) {
+    const dayW = /jour|day|dia|giorn|(?:\d+\s*j\b)|\bj\b/.test(m), feeW = hit(m, 'frais|fee|fees|cost|cout|coute|coste|cuesta|precio|comision|costi|costa|tarif|tarifa|prix|commission|prezzo');
+    const companyCostW = hit(m, 'entreprise|employeur|societe|rh|company|employer|empresa|azienda');
+    if (n.length >= 2 && dayW) {
       let [sal, d] = n; if (sal < d) [sal, d] = [d, sal];
       if (d < 1 || d > 31 || sal < 100 || sal > 100000) return null;
       const earned = R2(sal * d / CFG.days), cap = R2(earned * CFG.cap);
@@ -173,7 +302,7 @@
         it: `Con ${eur(sal)} di stipendio netto e ${d} giorni su ${CFG.days}: ${eur(earned)} già maturati, cioè fino a ${eur(cap)} accessibili (40 %). Per ${eur(cap)}, i costi sarebbero ${eur(R2(cap * CFG.a))} (0,20 %) o ${eur(R2(cap * CFG.b))} (0,70 %). Simulazione didattica, indicativa e senza valore di offerta.`
       })[L];
     }
-    if (n.length >= 1 && feeW) {
+    if (n.length >= 1 && feeW && !companyCostW) {
       const a = n[0]; if (a <= 0 || a > 100000) return null;
       const fa = R2(a * CFG.a), fb = R2(a * CFG.b);
       return ({
@@ -190,13 +319,19 @@
     const m = norm(raw);
     if (!m) return null;
     const c = calc(raw, m); if (c) return { t: c, go: 's', id: 'cap' };
-    if (hit(m, SMALL.bye[L]) && m.split(' ').length < 4) return { t: UI.bye };
-    if (hit(m, SMALL.thx[L]) && m.split(' ').length < 5) return { t: UI.thanks };
+    if (hit(m, SMALL.bye[L]) && meaningful(m).length <= 2) return { t: UI.bye };
+    if (hit(m, SMALL.thx[L]) && meaningful(m).length <= 2) return { t: UI.thanks };
     const cur = (window.EaRoute && window.EaRoute.cur && window.EaRoute.cur()) || 's';
-    let best = null, bs = 0;
-    TOPICS.forEach(t => { let s = score(m, t); if (s && t.v.includes(cur)) s += .5; if (s > bs) { bs = s; best = t; } });
-    if (best && bs >= 1) return { t: best.a[L], go: best.go, id: best.id };
-    if (hit(m, SMALL.hi[L])) return { t: UI.hello };
+    let ranked = TOPICS.map(t => ({ topic: t, value: score(m, t) + (t.v.includes(cur) ? .12 : 0) }))
+      .sort((a, b) => b.value - a.value);
+    const best = ranked[0], second = ranked[1];
+    /* Un score suffisant ET un minimum d'écart évitent de répondre au hasard. */
+    if (best && best.value >= 1.35 && (!second || best.value - second.value >= .08 || best.value >= 3.2)) {
+      return { t: best.topic.a[L], go: best.topic.go, id: best.topic.id };
+    }
+    if (hit(m, SMALL.hi[L]) && meaningful(m).length <= 2) return { t: UI.hello };
+    const excerpt = searchSite(raw);
+    if (excerpt) return { t: UI.found + '\n\n“' + excerpt + '”\n\n' + UI.fb, fb: 1 };
     return { t: UI.fb, fb: 1 };
   }
 
@@ -243,7 +378,7 @@
   const inp = el('input', { id: 'eac-in', type: 'text', placeholder: UI.ph, 'aria-label': UI.ph, maxlength: '300', enterkeyhint: 'send' });
   const send = el('button', { type: 'submit', 'aria-label': UI.send }); send.innerHTML = SVG('<path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/>');
   form.append(inp, send);
-  const foot = el('div', { id: 'eac-ft' }); const clr = el('button', { type: 'button', text: UI.clear }); foot.append(el('span', { text: UI.note }), clr);
+  const foot = el('div', { id: 'eac-ft' }); const clr = el('button', { type: 'button', text: UI.clear }); const aiConfigured = typeof window.EA_CHAT_API === 'string' && /^https:\/\//i.test(window.EA_CHAT_API.trim()); foot.append(el('span', { text: aiConfigured ? UI.noteAI : UI.note }), clr);
   panel.append(head, log, form, foot);
 
   /* ---------- Conversation ---------- */
@@ -280,11 +415,39 @@
       showChips(r.id, items[0]);
     }, reduce() ? 0 : 450 + Math.min(r.t.length, 400));
   }
-  function ask(text, topic) {
-    text = String(text || '').trim().slice(0, 300); if (!text) return;
-    dropChips(); addMsg('eac-u', text); hist.push({ r: 'u', t: text }); save();
-    const r = topic ? { t: topic.a[L], go: topic.go, id: topic.id } : answer(text);
-    reply(r || { t: UI.fb });
+  async function ask(text, topic) {
+    text = String(text || '').trim().slice(0, 1200); if (!text) return;
+    dropChips();
+    const previous = hist.slice(-8).map(h => ({ role: h.r === 'u' ? 'user' : 'assistant', content: String(h.t || '').slice(0, 1200) }));
+    addMsg('eac-u', text); hist.push({ r: 'u', t: text }); save();
+    const localResult = topic ? { t: topic.a[L], go: topic.go, id: topic.id } : answer(text);
+    const endpoint = typeof window.EA_CHAT_API === 'string' ? window.EA_CHAT_API.trim() : '';
+    const deterministicCalculation = !topic && !!calc(text, norm(text));
+    /* Les calculs déterministes et les boutons FAQ restent locaux. Les questions libres
+       passent par le Worker seulement lorsqu'il est explicitement configuré. */
+    if (!topic && endpoint && /^https:\/\//i.test(endpoint) && !deterministicCalculation) {
+      const typing = el('div', { class: 'eac-t', role: 'status', 'aria-label': UI.typing });
+      typing.append(el('i'), el('i'), el('i')); log.appendChild(typing); scroll(); send.disabled = true; inp.disabled = true;
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question: text, lang: L, audience: view(), history: previous })
+        });
+        if (!res.ok) throw new Error('AI endpoint HTTP ' + res.status);
+        const data = await res.json();
+        const generated = String(data.answer || '').trim();
+        if (!generated) throw new Error('Empty AI response');
+        typing.remove();
+        addMsg('eac-b', generated); hist.push({ r: 'b', t: generated }); save();
+        showChips(null);
+      } catch (err) {
+        typing.remove();
+        const fallback = localResult || { t: UI.fb, fb: 1 };
+        reply(fallback);
+      } finally { send.disabled = false; inp.disabled = false; inp.focus({ preventScroll: true }); }
+      return;
+    }
+    reply(localResult || { t: UI.fb, fb: 1 });
   }
   function start() {
     log.textContent = '';
