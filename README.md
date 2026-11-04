@@ -9,7 +9,7 @@ Concept en développement : aucune banque connectée, aucune intégration de pai
 | Fichier | Rôle |
 |---|---|
 | `index.html` | Le site complet : trois parcours (Salarié, Entreprise, Banque), simulateurs, console RH simulée, tableau de bord bancaire fictif, formulaire, mentions légales |
-| `chatbot.js` | Assistant local tolérant aux fautes, 4 langues, calculs et recherche dans le site ; connexion IA facultative |
+| `chatbot.js` | Assistant local tolérant aux fautes, 4 langues, calculs, garde-fous, filtrage de données sensibles et recherche dans le site ; connexion IA facultative |
 | `earnly-chat-worker.js` | Worker Cloudflare facultatif pour les réponses IA libres (clé API conservée côté serveur) |
 | `app.html` | Aperçu du téléphone de la démo seul, plein écran |
 | `salarie.html`, `entreprise.html`, `banque.html` | Aperçu de partage propre à chaque public (titre, description, image), puis redirection vers `index.html#…` |
@@ -31,7 +31,7 @@ On peut aussi ouvrir `index.html` directement : tout fonctionne, sauf le service
 ## Mettre en ligne
 
 1. Déposer le contenu de ce dossier à la racine du dépôt GitHub Pages (remplacer les fichiers existants).
-2. **Après chaque modification du site**, changer `VERSION` dans `sw.js` (actuellement `earnly-v11`) : c'est ce qui force les visiteurs à recevoir la nouvelle version au lieu de l'ancienne gardée en cache.
+2. **Après chaque modification du site**, changer `VERSION` dans `sw.js` (actuellement `earnly-v12`) : c'est ce qui force les visiteurs à recevoir la nouvelle version au lieu de l'ancienne gardée en cache.
 3. Si un domaine personnalisé est branché, remplacer `https://earnlysite.github.io/EarnlyWS/` dans `index.html`, `salarie.html`, `entreprise.html`, `banque.html`, `sitemap.xml` et `robots.txt`.
 4. **Mentions légales** : compléter les passages entre crochets (`[à compléter]`, `[da completare]`, `[to be completed]`, `[por completar]`) dans `index.html` quand les informations seront disponibles, puis faire relire le texte par un juriste.
 5. **Formulaire de contact** : les messages partent vers l'adresse du porteur du projet, sans qu'elle soit affichée. Au premier envoi test depuis le vrai domaine, le service de relais FormSubmit envoie un e-mail de confirmation à cette adresse : cliquer sur le lien pour l'activer. Tant que ce n'est pas fait, le site ouvre la messagerie du visiteur avec le message pré-rempli.
@@ -44,7 +44,7 @@ Avec Node.js 18 ou une version plus récente, depuis la racine du dépôt :
 node tests/earnly.test.cjs
 ```
 
-Le test vérifie les principales questions avec fautes, les calculs, les quatre langues, la recherche d’extraits du site et le relais IA avec une réponse API simulée. Il ne remplace pas un test navigateur complet ni un test en conditions réelles après déploiement du Worker.
+Le test vérifie les principales questions avec fautes, les calculs, les quatre langues, les demandes hors sujet, les demandes inappropriées, les situations de crise, les demandes ambiguës, la détection de données sensibles, la recherche d’extraits du site et le relais IA avec une réponse API simulée. Il ne remplace pas un test navigateur complet ni un test en conditions réelles après déploiement du Worker.
 
 ## Chatbot
 
@@ -56,24 +56,29 @@ Le test vérifie les principales questions avec fautes, les calculs, les quatre 
 - Tolère les accents manquants, les abréviations courantes, les fautes de frappe et certaines variantes de mots.
 - Répond sur les 15 grands sujets Earnly et effectue les calculs déterministes à partir des hypothèses affichées.
 - Si une question ne correspond pas à une réponse prédéfinie, recherche un passage pertinent dans les trois parcours du site. Il cite alors un extrait existant au lieu d’inventer une réponse.
-- Conserve l’historique dans `sessionStorage` : il reste dans l’onglet du navigateur et n’est pas envoyé à un serveur en mode local.
+- Oriente poliment les demandes hors sujet, refuse les demandes visant à nuire, frauder, harceler ou produire du contenu haineux/sexuellement explicite, et demande une précision quand la question est trop vague.
+- Répond avec un message de prudence aux formulations de crise et recommande de contacter les services d’urgence locaux en cas de danger immédiat.
+- Détecte certains formats évidents de données sensibles (IBAN, numéro de carte, mot de passe explicite) : le message est masqué dans l’historique et n’est pas envoyé au Worker IA. Ne saisissez toutefois aucune donnée personnelle ou confidentielle.
+- Conserve l’historique dans `sessionStorage` : il reste dans l’onglet du navigateur en mode local et peut être effacé avec « Nouvelle conversation ». Les messages détectés comme sensibles sont remplacés par un texte masqué.
 
-Ce mode n’est pas un modèle d’IA générative : il ne peut pas répondre de façon fiable à absolument n’importe quelle question. Il est volontairement prudent lorsqu’il ne trouve pas d’information.
+Ce mode n’est pas un modèle d’IA générative : il ne peut pas répondre de façon fiable à absolument n’importe quelle question. Les règles locales sont des garde-fous et ne remplacent pas une modération complète ; en cas de doute, il préfère demander une précision ou reconnaître qu’il ne sait pas.
 
 ### Mode IA (pour les questions vraiment libres)
 
-Un navigateur GitHub Pages ne doit jamais contenir une clé OpenAI : le code source est public. Le fichier `earnly-chat-worker.js` fournit un relais serveur Cloudflare prêt à configurer. Les calculs du salaire et les boutons de sujets restent locaux ; les questions libres sont envoyées au Worker lorsqu’une URL est configurée. En cas d’échec réseau, le chatbot revient à ses réponses locales.
+Un navigateur GitHub Pages ne doit jamais contenir une clé OpenAI : le code source est public. Le fichier `earnly-chat-worker.js` fournit un relais serveur Cloudflare prêt à configurer. Les calculs du salaire, les boutons FAQ et les demandes reconnues localement comme hors sujet, inappropriées, ambiguës ou sensibles restent locaux. Les autres questions libres sont envoyées au Worker lorsqu’une URL est configurée. En cas d’échec réseau, le chatbot revient à ses réponses locales.
 
 1. Dans Cloudflare, créez un Worker et collez le contenu de `earnly-chat-worker.js`, puis déployez-le.
 2. Créez un espace de stockage **Workers KV** et liez-le au Worker sous le nom `CHAT_RATE_LIMIT` (ce binding est requis pour limiter les requêtes à 20 par adresse IP et par minute).
 3. Dans les paramètres du Worker, ajoutez `OPENAI_API_KEY` comme **Secret**. Ne mettez jamais cette clé dans GitHub, dans `index.html` ou dans `chatbot.js`.
-4. Ajoutez la variable `ALLOWED_ORIGINS` avec `https://earnlysite.github.io`. Ajoutez votre domaine personnalisé éventuel, séparé par une virgule. Vous pouvez définir `OPENAI_MODEL` ; par défaut le Worker utilise `gpt-6-luna`.
+4. Ajoutez la variable `ALLOWED_ORIGINS` avec `https://earnlysite.github.io`. Ajoutez votre domaine personnalisé éventuel, séparé par une virgule. Définissez aussi `OPENAI_MODEL` avec un identifiant de modèle réellement disponible dans votre compte API. Le Worker ne démarre pas le chat si la clé ou le modèle manque : aucun nom de modèle supposé n’est utilisé par défaut.
 5. Vérifiez l’adresse `https://VOTRE-WORKER.workers.dev/health` : elle doit répondre `ok: true`. La route `/chat` n’accepte que l’origine configurée. CORS n’est pas un système d’authentification : conservez le quota KV et surveillez l’usage du Worker.
 6. Dans `index.html`, remplacez la valeur vide de `window.EA_CHAT_API` par l’URL du Worker terminant par `/chat`, par exemple `https://VOTRE-WORKER.workers.dev/chat`.
 
 Quand le mode IA est activé, les messages et les derniers échanges sont transmis au Worker puis au fournisseur IA pour produire les réponses. Le pied de chat l’indique. Ne saisissez jamais de coordonnées bancaires, données de paie, identifiants ou informations sensibles. La clé API reste stockée côté Worker. L’utilisation de l’API peut entraîner une facturation séparée selon le compte et le modèle choisis.
 
 ### Garde-fous de contenu
+
+Le chatbot distingue les demandes Earnly, les demandes hors sujet, les demandes ambiguës et les demandes auxquelles il ne dispose pas d’une réponse fiable. Les règles locales bloquent certaines demandes clairement nuisibles et empêchent l’envoi de quelques formats évidents de secrets ; ce filtrage n’est pas infaillible. Le Worker applique des règles complémentaires : refus calme des demandes nuisibles, protection des informations sensibles, traitement prioritaire des situations de crise et défense contre les tentatives de prompt injection. Il peut toutefois nécessiter des ajustements après des essais réels.
 
 Le Worker contient les règles Earnly : concept non lancé, aucun partenaire signé, données fictives, taux et plafond comme hypothèses, rôles des acteurs, circuit de remboursement à valider, et absence de validation juridique/réglementaire. Il demande au modèle de distinguer systématiquement les faits, les hypothèses et les points non validés. Les réponses de l’IA restent à contrôler avant une mise en production commerciale.
 
@@ -84,7 +89,7 @@ Pour modifier les réponses locales, éditer `TOPICS` et `CFG` au début de `cha
 - **Langues** : français, anglais, espagnol, italien (sélecteur en haut de page, choix mémorisé dans le navigateur). Les nombres suivent la langue choisie.
 - **Intro illustrée** : une courte animation par parcours, jouée une fois par parcours et par visite — le salaire qui se remplit (Salarié), les tâches répétitives barrées pour une seule vérification (Entreprise), le module Earnly qui s'ajoute aux services de la banque (Banque). Bouton « Passer », clic, touche Échap, ou réglage « réduire les animations » du système pour l'ignorer.
 - **Mentions légales** : lien discret en bas de page, fenêtre plein écran dans la langue choisie.
-- **Données** : aucune donnée n'est collectée sauf via le formulaire. Aucun cookie publicitaire ni outil d'audience. Les simulations tournent dans le navigateur avec des données fictives ; rien n'est enregistré ni transmis.
+- **Données** : les simulateurs utilisent des données fictives et calculent dans le navigateur. La langue et l’historique du chatbot local sont conservés dans le navigateur (langue en stockage local, conversation dans `sessionStorage`) ; « Nouvelle conversation » efface l’historique. Les demandes détectées comme contenant un IBAN, un numéro de carte ou un mot de passe sont masquées et ne sont pas transmises au Worker IA. Si le mode IA est activé, certaines questions libres et une partie de l’historique non sensible sont envoyées au Worker puis au fournisseur IA. Le formulaire de contact transmet les informations saisies pour recevoir une réponse. Aucun cookie publicitaire ni outil d’audience n’est utilisé.
 
 ## Structure des pages
 

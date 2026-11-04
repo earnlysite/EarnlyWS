@@ -19,29 +19,50 @@
       note: 'Assistant automatique. Messages conservés dans cet onglet uniquement ; aucun envoi au serveur. Pas de conseil financier ou juridique.',
       fb: 'Je peux répondre sur Earnly, son fonctionnement et les hypothèses du projet, mais je n’ai pas trouvé de réponse fiable à cette question. Reformulez-la ou choisissez un sujet ci-dessous.',
       found: 'Voici le passage du site qui semble le plus proche de votre question :',
-      noteAI: 'Avec l’IA activée, les questions libres sont transmises au service configuré ; les calculs restent locaux. N’envoyez aucune donnée bancaire, de paie ou sensible.',
-      thanks: 'Avec plaisir ! D’autres questions ?', bye: 'À bientôt !', more: 'Pour aller plus loin :', typing: 'L’assistant écrit…', views: { s: 'Page Salarié', e: 'Page Entreprise', b: 'Page Banque' } },
+      noteAI: 'Avec l’IA activée, certaines questions libres sont transmises au service configuré ; les calculs, demandes hors sujet et contenus sensibles détectés restent locaux. N’envoyez aucune donnée bancaire, de paie ou sensible.',
+      thanks: 'Avec plaisir ! D’autres questions ?', bye: 'À bientôt !', more: 'Pour aller plus loin :',
+      offTopic: 'Je suis l’assistant du projet Earnly : je peux vous aider sur son fonctionnement, ses hypothèses, les frais, les avances, le remboursement, les données ou le rôle de chacun. Votre question semble porter sur un autre sujet ; je ne suis pas conçu pour remplacer un assistant généraliste. Si vous le souhaitez, reformulez-la sous l’angle d’Earnly.',
+      inappropriate: 'Je ne peux pas aider à produire un contenu insultant, discriminatoire ou sexuellement explicite, à faciliter une fraude ou à porter atteinte à quelqu’un. Je peux toutefois vous aider à reformuler votre demande de manière respectueuse et légitime, ou répondre à une question professionnelle sur Earnly.',
+      clarify: 'Je préfère ne pas deviner. Pouvez-vous préciser ce que vous voulez savoir : le fonctionnement d’Earnly, le montant d’une avance, les frais, le remboursement, les données ou le rôle de l’entreprise / de la banque ?',
+      crisis: 'Je suis désolé que vous traversiez cela. Je ne suis pas un service d’urgence. Si vous ou quelqu’un d’autre êtes en danger immédiat, contactez les services d’urgence locaux maintenant et rapprochez-vous d’une personne de confiance. Si vous parlez d’une situation liée au travail ou à Earnly, vous pouvez me donner uniquement les éléments non sensibles.',
+      sensitive: 'Pour votre sécurité, ne partagez pas de numéro de carte, IBAN, mot de passe, identifiant bancaire ou donnée de paie ici. J’ai masqué ce message et ne le transmets pas au service IA. Vous pouvez reformuler sans information personnelle.',
+      typing: 'L’assistant écrit…', views: { s: 'Page Salarié', e: 'Page Entreprise', b: 'Page Banque' } },
     en: { open: 'Ask a question', close: 'Close', title: 'Earnly assistant', sub: 'Ask naturally, even with typos', ph: 'Your question…', send: 'Send', clear: 'New conversation',
       hello: 'Hello! I can answer questions about Earnly: the principle, fees, repayment, data, and the role of the employer or the bank. Earnly is a concept in design, with fictional data.',
       note: 'Automatic assistant. Messages stay in this browser tab; nothing is sent to a server. No financial or legal advice.',
       fb: 'I can answer questions about Earnly and the project assumptions, but I could not find a reliable answer to this question. Rephrase it or choose a topic below.',
       found: 'This is the passage on the site that seems closest to your question:',
-      noteAI: 'With AI enabled, free-form questions are sent to the configured AI service; calculations stay local. Do not send bank, payroll or sensitive data.',
-      thanks: 'My pleasure! Any other questions?', bye: 'See you soon!', more: 'To go further:', typing: 'The assistant is typing…', views: { s: 'Employee page', e: 'Company page', b: 'Bank page' } },
+      noteAI: 'With AI enabled, some free-form questions are sent to the configured AI service; calculations, off-topic requests and detected sensitive content stay local. Do not send bank, payroll or sensitive data.',
+      thanks: 'My pleasure! Any other questions?', bye: 'See you soon!', more: 'To go further:',
+      offTopic: 'I am the assistant for the Earnly project. I can help with its concept, assumptions, fees, advances, repayment, data and the roles of each party. Your question appears unrelated; I am not designed to replace a general-purpose assistant. Please reframe it in the context of Earnly if you can.',
+      inappropriate: 'I can’t help create abusive, discriminatory or sexually explicit content, facilitate fraud, or harm another person. I can help rephrase your request respectfully and lawfully, or answer a professional question about Earnly.',
+      clarify: 'I don’t want to guess. Could you clarify what you mean: Earnly’s model, an advance amount, fees, repayment, data, or the role of the employer / bank?',
+      crisis: 'I’m sorry you’re going through this. I’m not an emergency service. If you or someone else is in immediate danger, contact local emergency services now and reach out to someone you trust. If this concerns work or Earnly, share only non-sensitive details.',
+      sensitive: 'For your safety, do not share card numbers, IBANs, passwords, bank credentials or payroll details here. I have masked this message and will not send it to the AI service. Please rephrase without personal information.', typing: 'The assistant is typing…', views: { s: 'Employee page', e: 'Company page', b: 'Bank page' } },
     es: { open: 'Hacer una pregunta', close: 'Cerrar', title: 'Asistente Earnly', sub: 'Pregunte con naturalidad, incluso con errores', ph: 'Su pregunta…', send: 'Enviar', clear: 'Nueva conversación',
       hello: '¡Hola! Respondo a sus preguntas sobre Earnly: el principio, las comisiones, el reembolso, los datos y el papel de la empresa o del banco. Earnly es un concepto en diseño, con datos ficticios.',
       note: 'Asistente automático. Los mensajes permanecen en esta pestaña; no se envían a ningún servidor. Sin asesoramiento financiero ni jurídico.',
       fb: 'Puedo responder sobre Earnly y las hipótesis del proyecto, pero no he encontrado una respuesta fiable. Reformule la pregunta o elija un tema.',
       found: 'Este es el pasaje del sitio que parece más relacionado con su pregunta:',
-      noteAI: 'Con la IA activada, las preguntas libres se envían al servicio configurado; los cálculos permanecen locales. No envíe datos bancarios, de nómina ni sensibles.',
-      thanks: '¡Con gusto! ¿Alguna otra pregunta?', bye: '¡Hasta pronto!', more: 'Para saber más:', typing: 'El asistente está escribiendo…', views: { s: 'Página Empleado', e: 'Página Empresa', b: 'Página Banco' } },
+      noteAI: 'Con la IA activada, algunas preguntas libres se envían al servicio configurado; los cálculos, las preguntas ajenas al tema y los datos sensibles detectados permanecen locales. No envíe datos bancarios, de nómina ni sensibles.',
+      thanks: '¡Con gusto! ¿Alguna otra pregunta?', bye: '¡Hasta pronto!', more: 'Para saber más:',
+      offTopic: 'Soy el asistente del proyecto Earnly. Puedo ayudarle con el concepto, las hipótesis, las comisiones, los anticipos, el reembolso, los datos y las funciones de cada parte. Su pregunta parece no estar relacionada; no estoy diseñado para sustituir a un asistente general. Si lo desea, reformúlela en el contexto de Earnly.',
+      inappropriate: 'No puedo ayudar a crear contenido insultante, discriminatorio o sexualmente explícito, facilitar un fraude ni perjudicar a otra persona. Sí puedo ayudarle a reformular la petición de forma respetuosa y legítima o responder a una pregunta profesional sobre Earnly.',
+      clarify: 'No quiero hacer suposiciones. ¿Puede precisar qué desea saber: el modelo de Earnly, el importe de un anticipo, las comisiones, el reembolso, los datos o la función de la empresa / el banco?',
+      crisis: 'Siento que esté pasando por esto. No soy un servicio de emergencia. Si usted u otra persona está en peligro inmediato, contacte ahora con los servicios de emergencia locales y busque a alguien de confianza. Si se trata de una situación laboral o relacionada con Earnly, comparta solo información no sensible.',
+      sensitive: 'Por su seguridad, no comparta aquí números de tarjeta, IBAN, contraseñas, credenciales bancarias ni datos de nómina. He ocultado este mensaje y no lo enviaré al servicio de IA. Reformule sin datos personales.', typing: 'El asistente está escribiendo…', views: { s: 'Página Empleado', e: 'Página Empresa', b: 'Página Banco' } },
     it: { open: 'Fai una domanda', close: 'Chiudi', title: 'Assistente Earnly', sub: 'Fai la tua domanda, anche con errori', ph: 'La sua domanda…', send: 'Invia', clear: 'Nuova conversazione',
       hello: 'Buongiorno! Rispondo alle sue domande su Earnly: il principio, i costi, il rimborso, i dati e il ruolo dell’azienda o della banca. Earnly è un concept in progettazione, con dati fittizi.',
       note: 'Assistente automatico. I messaggi restano in questa scheda; non vengono inviati a un server. Nessuna consulenza finanziaria o legale.',
       fb: 'Posso rispondere su Earnly e sulle ipotesi del progetto, ma non ho trovato una risposta affidabile. Riformuli la domanda o scelga un argomento.',
       found: 'Ecco il passaggio del sito che sembra più vicino alla sua domanda:',
-      noteAI: 'Con l’IA attivata, le domande libere vengono inviate al servizio configurato; i calcoli restano locali. Non invii dati bancari, retributivi o sensibili.',
-      thanks: 'Con piacere! Altre domande?', bye: 'A presto!', more: 'Per approfondire:', typing: 'L’assistente sta scrivendo…', views: { s: 'Pagina Dipendente', e: 'Pagina Azienda', b: 'Pagina Banca' } }
+      noteAI: 'Con l’IA attivata, alcune domande libere vengono inviate al servizio configurato; calcoli, richieste fuori tema e dati sensibili rilevati restano locali. Non invii dati bancari, retributivi o sensibili.',
+      thanks: 'Con piacere! Altre domande?', bye: 'A presto!', more: 'Per approfondire:',
+      offTopic: 'Sono l’assistente del progetto Earnly. Posso aiutare con il concetto, le ipotesi, i costi, gli anticipi, il rimborso, i dati e i ruoli delle parti coinvolte. La sua domanda sembra non essere pertinente; non sono progettato per sostituire un assistente generalista. Se vuole, la riformuli nel contesto di Earnly.',
+      inappropriate: 'Non posso aiutare a creare contenuti offensivi, discriminatori o sessualmente espliciti, facilitare una frode o danneggiare un’altra persona. Posso aiutarla a riformulare la richiesta in modo rispettoso e lecito o rispondere a una domanda professionale su Earnly.',
+      clarify: 'Non voglio fare supposizioni. Può precisare cosa desidera sapere: il modello Earnly, l’importo di un anticipo, i costi, il rimborso, i dati o il ruolo dell’azienda / della banca?',
+      crisis: 'Mi dispiace che stia vivendo questa situazione. Non sono un servizio di emergenza. Se lei o qualcun altro è in pericolo immediato, contatti subito i servizi di emergenza locali e si rivolga a una persona fidata. Se riguarda il lavoro o Earnly, condivida solo informazioni non sensibili.',
+      sensitive: 'Per la sua sicurezza, non condivida qui numeri di carta, IBAN, password, credenziali bancarie o dati retributivi. Ho nascosto questo messaggio e non lo invierò al servizio IA. Riformuli senza dati personali.', typing: 'L’assistente sta scrivendo…', views: { s: 'Pagina Dipendente', e: 'Pagina Azienda', b: 'Pagina Banca' } }
   }[L];
 
   /* ---------- Base de connaissances ----------
@@ -315,21 +336,64 @@
     return null;
   }
 
+  /* ---------- Limites conversationnels et orientation ----------
+     Les règles locales sont volontairement prudentes : en cas de doute, demander une précision
+     plutôt que fabriquer une réponse. Le Worker applique les mêmes principes en mode IA. */
+  function classifyBoundary(raw, m) {
+    const q = m || norm(raw);
+    const crisis = /\b(suicid|suicide|me tuer|me faire du mal|me blesser|en finir|je veux mourir|kill myself|hurt myself|end my life|suicidarme|hacerme dano|quitarme la vida|farmi del male|uccidermi|non voglio vivere)\b/.test(q);
+    if (crisis) return 'crisis';
+
+    const preventive = /\b(prevenir|eviter|proteger|se proteger|detecter|identifier|reconnaitre|prevent|avoid|protect|detect|recognize|recognise|prevenir|evitar|proteger|detectar|riconoscere|evitare|proteggere|prevenire)\b/.test(q);
+    const harmfulRequest = /\b(comment|aide moi|aidez moi|fais|ecris|redige|genere|cree|explique comment|how to|help me|write|create|make|como|ayudame|escribe|crea|come|aiutami|scrivi)\b/.test(q) &&
+      /\b(pirater|hacker|voler|robber|rober|tuer|agresser|blesser quelqu un|faire du mal a quelqu un|escroquer|arnaquer|frauder|phishing|ransomware|malware|bombe|explosif|arme|voler identifiants|mot de passe|doxx|menacer|harceler|chantager|humilier|insulter|insultant|raciste|homophobe|sexiste|pornographique|porno|sexuellement explicite|hack|steal|rob|kill someone|hurt someone|attack someone|bomb|explosive|weapon|scam|defraud|phish|blackmail|stalk|dox|threaten|harass|slur|racist|porn|explicit sexual|robar|matar a alguien|hacer dano a alguien|agredir|bomba|explosivo|arma|estafar|suplantar|chantajear|acosar|amenazar|insultar|racista|pornografico|rubare|uccidere qualcuno|ferire qualcuno|aggredire|bomba|esplosivo|arma|truffare|ricattare|molestare|minacciare|insultare|razzista|porno)\b/.test(q);
+    const directHarm = /\b(je veux tuer quelqu un|je veux blesser quelqu un|i want to kill someone|i want to hurt someone|quiero matar a alguien|voglio uccidere qualcuno)\b/.test(q);
+    if ((harmfulRequest && !preventive) || directHarm) return 'inappropriate';
+
+    const vague = /^(et ca|et alors|pourquoi|comment|comment faire|combien|combien ca|ca marche|c est quoi|explique|detaille|plus|precise|et ensuite|what about that|and then|why|how|how do i|how much|what|explain|more|que pasa|y eso|por que|como|como hago|cuanto|explica|e quindi|perche|come|quanto|come faccio|spiega|e poi)$/.test(q);
+    if (vague) return 'clarify';
+    return null;
+  }
+
+  function containsSensitive(raw) {
+    const text = String(raw || '');
+    const compact = text.replace(/[\s-]/g, '');
+    const hasIban = /\b[A-Z]{2}\d{2}[A-Z0-9]{11,30}\b/i.test(compact);
+    const hasLongNumber = /(?:\d[\s-]*){13,19}/.test(text);
+    const hasSecret = /\b(mon mot de passe est|my password is|mi contrasena es|la mia password e|mon code secret est|my bank login is)\b/i.test(text);
+    return hasIban || hasLongNumber || hasSecret;
+  }
+
+  const EARNLY_CONTEXT = /\b(earnly|salaire|salair|avance|avances|paie|paye|employeur|entreprise|banque|bancaire|frais|commission|remboursement|rembourser|sepa|rh|salari|payroll|salary|wage|advance|repay|repayment|employer|company|bank|fee|fees|earned wage|adelanto|salario|reembolso|empresa|banco|anticipo|stipendio|rimborso|azienda|banca|anticipo)\b/;
+  const CLEAR_OFF_TOPIC = /\b(voiture|voitures|automobile|auto|car|cars|weather|meteo|météo|recette|cuisine|recipe|cook|football|soccer|basketball|basket|tennis|film|movie|cinema|musique|music|concert|vacances|voyage|travel|trip|jeu video|gaming|game|politique|politics|election|elections|crypto|bitcoin|bourse|stock market|maths|mathematiques|homework|devoirs|traduction|translate|traduire)\b/;
+
   function answer(raw) {
     const m = norm(raw);
     if (!m) return null;
+    const boundary = classifyBoundary(raw, m);
+    if (boundary === 'crisis' || boundary === 'inappropriate') return { t: UI[boundary], boundary };
     const c = calc(raw, m); if (c) return { t: c, go: 's', id: 'cap' };
     if (hit(m, SMALL.bye[L]) && meaningful(m).length <= 2) return { t: UI.bye };
     if (hit(m, SMALL.thx[L]) && meaningful(m).length <= 2) return { t: UI.thanks };
+    /* Ne pas confondre une simple mention de la marque avec une réponse sur une
+       fonctionnalité précise qui n'est pas documentée (carte, assurance, wallet…). */
+    if (/\bearnly\b/.test(m) && /\b(carte|cartes|carte bancaire|card|cards|wallet|portefeuille|assurance|insurance|crypto|cryptomonnaie|application mobile|mobile app|cashback|cash back|investissement|investment|pret|loan|credit|crédit)\b/.test(m)) {
+      return { t: UI.fb, fb: 1 };
+    }
     const cur = (window.EaRoute && window.EaRoute.cur && window.EaRoute.cur()) || 's';
     let ranked = TOPICS.map(t => ({ topic: t, value: score(m, t) + (t.v.includes(cur) ? .12 : 0) }))
       .sort((a, b) => b.value - a.value);
     const best = ranked[0], second = ranked[1];
     /* Un score suffisant ET un minimum d'écart évitent de répondre au hasard. */
+    if (CLEAR_OFF_TOPIC.test(m) && !EARNLY_CONTEXT.test(m)) return { t: UI.offTopic, boundary: 'off-topic' };
     if (best && best.value >= 1.35 && (!second || best.value - second.value >= .08 || best.value >= 3.2)) {
       return { t: best.topic.a[L], go: best.topic.go, id: best.topic.id };
     }
     if (hit(m, SMALL.hi[L]) && meaningful(m).length <= 2) return { t: UI.hello };
+    if (boundary === 'clarify') return { t: UI.clarify, boundary };
+    /* Les questions clairement étrangères au périmètre ne doivent pas déclencher
+       une réponse Earnly sur la base d'un mot générique comme « combien ». */
+    if (!EARNLY_CONTEXT.test(m) && (!best || best.value < 1.35)) return { t: UI.offTopic, boundary: 'off-topic' };
     const excerpt = searchSite(raw);
     if (excerpt) return { t: UI.found + '\n\n“' + excerpt + '”\n\n' + UI.fb, fb: 1 };
     return { t: UI.fb, fb: 1 };
@@ -419,13 +483,16 @@
     text = String(text || '').trim().slice(0, 1200); if (!text) return;
     dropChips();
     const previous = hist.slice(-8).map(h => ({ role: h.r === 'u' ? 'user' : 'assistant', content: String(h.t || '').slice(0, 1200) }));
-    addMsg('eac-u', text); hist.push({ r: 'u', t: text }); save();
-    const localResult = topic ? { t: topic.a[L], go: topic.go, id: topic.id } : answer(text);
+    const sensitiveInput = containsSensitive(text);
+    addMsg('eac-u', sensitiveInput ? 'Message masqué pour votre sécurité.' : text);
+    hist.push({ r: 'u', t: sensitiveInput ? '[Message masqué : donnée sensible détectée]' : text }); save();
+    const localResult = sensitiveInput ? { t: UI.sensitive, boundary: 'sensitive' } : (topic ? { t: topic.a[L], go: topic.go, id: topic.id } : answer(text));
     const endpoint = typeof window.EA_CHAT_API === 'string' ? window.EA_CHAT_API.trim() : '';
     const deterministicCalculation = !topic && !!calc(text, norm(text));
+    const keepLocal = sensitiveInput || ['crisis', 'inappropriate', 'off-topic', 'clarify'].includes(localResult && localResult.boundary);
     /* Les calculs déterministes et les boutons FAQ restent locaux. Les questions libres
        passent par le Worker seulement lorsqu'il est explicitement configuré. */
-    if (!topic && endpoint && /^https:\/\//i.test(endpoint) && !deterministicCalculation) {
+    if (!topic && !keepLocal && endpoint && /^https:\/\//i.test(endpoint) && !deterministicCalculation) {
       const typing = el('div', { class: 'eac-t', role: 'status', 'aria-label': UI.typing });
       typing.append(el('i'), el('i'), el('i')); log.appendChild(typing); scroll(); send.disabled = true; inp.disabled = true;
       try {
